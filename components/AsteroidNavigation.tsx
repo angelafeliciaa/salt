@@ -18,12 +18,7 @@ export function AsteroidNavigation({
   onNext
 }: AsteroidNavigationProps) {
   return (
-    <div className="asteroid-navigation">
-      <div className="hazardous-label">
-        <span className="warning-icon">⚠️</span> 
-        Potentially Hazardous Asteroid Navigator
-      </div>
-      
+    <div className="asteroid-navigation">      
       <div className="navigation-controls">
         <button 
           className="nav-button prev-button"
@@ -32,13 +27,6 @@ export function AsteroidNavigation({
         >
           &lt; Previous
         </button>
-        
-        <div className="asteroid-counter">
-          Asteroid {currentIndex + 1} of {totalAsteroids}
-          {totalAsteroidsInDatabase && totalAsteroidsInDatabase > totalAsteroids && (
-            <span className="total-count"> (from {totalAsteroidsInDatabase} database total)</span>
-          )}
-        </div>
         
         <button 
           className="nav-button next-button"
