@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
@@ -9,6 +9,7 @@ import EnhancedPlanet from "./EnhancedPlanet";
 import Stars from "./Stars";
 import Explosion from "./Explosion";
 import Asteroid, { AsteroidData } from "./Asteroid";
+import CameraController from "./CameraController";
 
 interface PlanetData {
   name: string;
@@ -66,7 +67,7 @@ const EARTH_SIZE = 0.15; // Visual size in the scene
 const EARTH_DISTANCE = 2.5; // Distance from Sun in scene units
 const ANIMATION_SPEED = 0.5; // Higher values = faster orbits
 
-export function Planet({
+export const Planet = React.forwardRef(({
   planet,
   animationSpeed = ANIMATION_SPEED,
   showLabel = true,
@@ -74,7 +75,7 @@ export function Planet({
   planet: PlanetData;
   animationSpeed?: number;
   showLabel?: boolean;
-}) {
+}, ref: React.ForwardedRef<THREE.Group>) => {
   // Calculate planet size relative to Earth
   const size = planet.size * EARTH_SIZE;
   
@@ -135,19 +136,23 @@ export function Planet({
       })()}
       
       {/* Planet with enhanced visuals */}
-      <EnhancedPlanet 
-        name={planet.name}
-        position={position}
-        size={size}
-        color={planet.color}
-        rotationSpeed={rotationSpeed}
-        hasAtmosphere={hasAtmosphere}
-        atmosphereColor={atmosphereColor}
-        showLabel={showLabel}
-      />
+      <group ref={ref}>
+        <EnhancedPlanet 
+          name={planet.name}
+          position={position}
+          size={size}
+          color={planet.color}
+          rotationSpeed={rotationSpeed}
+          hasAtmosphere={hasAtmosphere}
+          atmosphereColor={atmosphereColor}
+          showLabel={showLabel}
+        />
+      </group>
     </>
   );
-}
+});
+
+Planet.displayName = 'Planet';
 
 // Basic Sun component wrapper
 export function SunNode() {
@@ -211,6 +216,8 @@ interface SolarSystemProps {
   asteroidPositions?: [number, number, number][];
   selectedAsteroidId?: string;
   onAsteroidClick?: (asteroid: AsteroidData) => void;
+  navigationTarget?: "none" | "earth" | "asteroid";
+  onNavigationComplete?: () => void;
 }
 
 export default function SolarSystem({
@@ -219,10 +226,16 @@ export default function SolarSystem({
   asteroids = [],
   asteroidPositions = [],
   selectedAsteroidId = "",
-  onAsteroidClick = () => {}
+  onAsteroidClick = () => {},
+  navigationTarget = "none",
+  onNavigationComplete = () => {}
 }: SolarSystemProps) {
   const [showExplosion, setShowExplosion] = useState(false);
   const [explosionPosition, setExplosionPosition] = useState<[number, number, number]>([0, 0, 0]);
+  
+  // References for camera navigation
+  const earthRef = useRef<THREE.Group>(null);
+  const asteroidRef = useRef<THREE.Group>(null);
 
   // Random explosion effect for fun
   const triggerRandomExplosion = () => {
@@ -240,21 +253,37 @@ export default function SolarSystem({
 
   return (
     <>
-      {/* Background stars - reduced count for less visual clutter */}
-      <Stars count={800} radius={100} starSize={0.12} />
+      {/* Background stars - scaled far away from the solar system */}
+      <Stars count={2500} radius={1000} starSize={1.5} />
       
       {/* The Sun */}
       <SunNode />
       
       {/* Inner Planets */}
-      {innerPlanets.map((planet) => (
-        <Planet 
-          key={planet.name} 
-          planet={planet} 
-          animationSpeed={animationSpeed}
-          showLabel={showLabels}
-        />
-      ))}
+      {innerPlanets.map((planet) => {
+        // Earth gets a special ref for camera navigation
+        if (planet.name === "Earth") {
+          return (
+            <Planet 
+              key={planet.name}
+              planet={planet} 
+              animationSpeed={animationSpeed}
+              showLabel={showLabels}
+              ref={earthRef}
+            />
+          );
+        }
+        
+        // Other planets
+        return (
+          <Planet 
+            key={planet.name} 
+            planet={planet} 
+            animationSpeed={animationSpeed}
+            showLabel={showLabels}
+          />
+        );
+      })}
       
       {/* Render only the selected asteroid */}
       {(() => {
@@ -268,6 +297,7 @@ export default function SolarSystem({
               position={asteroidPositions[selectedIndex] || [0, 0, 0]}
               selected={true}
               onClick={() => onAsteroidClick(selectedAsteroid)}
+              ref={asteroidRef}
             />
           );
         }
@@ -295,6 +325,14 @@ export default function SolarSystem({
         <meshBasicMaterial transparent opacity={0} />
       {/* @ts-ignore - r3f types */}
       </mesh>
+      
+      {/* Camera controller for Earth and Asteroid navigation */}
+      <CameraController 
+        earthRef={earthRef}
+        asteroidRef={asteroidRef}
+        navigationTarget={navigationTarget}
+        onNavigationComplete={onNavigationComplete}
+      />
     </>
   );
 }

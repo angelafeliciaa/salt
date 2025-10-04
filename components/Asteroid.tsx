@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, forwardRef, ForwardedRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
@@ -48,12 +48,13 @@ interface AsteroidProps {
   onClick: () => void;
 }
 
-export function Asteroid({ 
+// Use forwardRef to properly handle ref passing
+export const Asteroid = forwardRef(({ 
   asteroid, 
   position, 
   selected,
   onClick 
-}: AsteroidProps) {
+}: AsteroidProps, ref: ForwardedRef<THREE.Group>) => {
   const asteroidRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
 
@@ -94,7 +95,17 @@ export function Asteroid({
 
   return (
     <group 
-      ref={asteroidRef}
+      ref={(node: THREE.Group | null) => {
+        // Handle both refs - our internal ref and the forwarded ref
+        asteroidRef.current = node;
+        
+        // Handle the forwarded ref properly
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      }}
       position={position}
       onClick={onClick}
       onPointerOver={() => setHovered(true)}
@@ -143,8 +154,6 @@ export function Asteroid({
           <Text
             fontSize={0.1}
             color="#ffffff"
-            backgroundColor={asteroid.isPotentiallyHazardous ? "#ff450088" : "#00000088"}
-            padding={0.05}
             anchorX="center"
             anchorY="bottom"
           >
@@ -154,6 +163,9 @@ export function Asteroid({
       )}
     </group>
   );
-}
+});
+
+// Add display name for better debugging
+Asteroid.displayName = 'Asteroid';
 
 export default Asteroid;

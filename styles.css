@@ -179,6 +179,45 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   text-align: right;
 }
 
+/* Camera Navigation */
+.camera-navigation {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: rgba(6, 10, 28, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  border-radius: 10px;
+  padding: 10px;
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  gap: 10px;
+}
+
+.camera-button {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #ffffff;
+  font-weight: bold;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.camera-button:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.camera-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Asteroid Navigation */
 .asteroid-navigation {
   position: fixed;
@@ -552,6 +591,18 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
 @media (max-width: 720px) {
 	#info-panel { left: 16px; right: 16px; width: auto; }
 	.controls input[type="range"] { width: 120px; }
+  
+  .camera-navigation {
+    top: 10px;
+    width: calc(100% - 20px);
+    max-width: 320px;
+    padding: 8px;
+  }
+  
+  .camera-button {
+    padding: 5px 14px;
+    font-size: 0.9em;
+  }
   
   .asteroid-info-panel {
     top: auto;

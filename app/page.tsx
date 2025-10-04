@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import CartesianScene from "../components/CartesianScene";
 import SolarSystem, { SolarSystemControls } from "../components/SolarSystem";
 import useAsteroidManager from "../components/useAsteroidManager";
 import AsteroidInfo from "../components/AsteroidInfo";
 import AsteroidEnergy from "../components/AsteroidEnergy";
 import AsteroidNavigation from "../components/AsteroidNavigation";
+import CameraNavigation from "../components/CameraNavigation";
 
 export default function HomePage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
   const [showLabels, setShowLabels] = useState(true);
+  const [navigationTarget, setNavigationTarget] = useState<"none" | "earth" | "asteroid">("none");
   
   // Use the asteroid manager hook to handle asteroid data and logic
   const {
@@ -60,6 +62,8 @@ export default function HomePage() {
           asteroidPositions={asteroidPositions}
           selectedAsteroidId={selectedAsteroid?.id}
           onAsteroidClick={handleAsteroidClick}
+          navigationTarget={navigationTarget}
+          onNavigationComplete={() => setNavigationTarget("none")}
         />
       </CartesianScene>
       
@@ -91,6 +95,13 @@ export default function HomePage() {
           onNext={nextAsteroid}
         />
       )}
+      
+      {/* Camera Navigation buttons */}
+      <CameraNavigation
+        onNavigateToEarth={() => setNavigationTarget("earth")}
+        onNavigateToAsteroid={() => setNavigationTarget("asteroid")}
+        asteroidSelected={!!selectedAsteroid}
+      />
     </main>
   );
 }

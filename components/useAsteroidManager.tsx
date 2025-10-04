@@ -105,11 +105,13 @@ export function useAsteroidManager() {
     fetchAsteroids();
   };
   
-  // Calculate positions for each asteroid
-  const asteroidPositions = asteroids.map(asteroid => {
-    // Use utility function to determine position
-    return calculateAsteroidPosition(asteroid);
-  });
+  // Calculate positions for each asteroid (memoized to prevent recalculation)
+  const asteroidPositions = React.useMemo(() => {
+    return asteroids.map(asteroid => {
+      // Use utility function to determine position with the asteroid ID as seed
+      return calculateAsteroidPosition(asteroid);
+    });
+  }, [asteroids]); // Only recalculate when asteroids array changes
   
   return {
     asteroids,
