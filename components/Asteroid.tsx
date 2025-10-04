@@ -56,22 +56,34 @@ export function Asteroid({
   // Calculate size based on asteroid diameter, but keep it visible
   const size = Math.max(0.1, asteroid.diameter.avg * 0.1);
   
-  // Different colors based on hazard status and selection status
-  const color = asteroid.isPotentiallyHazardous 
-    ? "#ff4500" 
-    : "#9b7653"; // Orange-red if hazardous, brown if not
+  // All asteroids are hazardous now, use a more threatening color
+  const color = "#ff2200"; // Bright red for hazardous asteroids
   
-  // Small wobbling animation for the asteroid
-  useFrame(({ clock }) => {
+  // Simple rotation animation for the asteroid, no position changes on hover
+  useFrame(() => {
     if (asteroidRef.current) {
       // Rotate the asteroid
       asteroidRef.current.rotation.y += 0.005;
       asteroidRef.current.rotation.x += 0.002;
       
-      // Add a little wobble if it's selected or hovered
-      if (selected || hovered) {
-        const wobble = Math.sin(clock.getElapsedTime() * 2) * 0.05;
-        asteroidRef.current.position.y = wobble;
+      // No position change on hover or selection - commented out deliberately
+      // to prevent unwanted movement when hovering
+    }
+  });
+
+  // Use ref for glow animation
+  const glowRef = useRef<THREE.Mesh>(null);
+  
+  // Animate the glow
+  useFrame(({ clock }) => {
+    if (glowRef.current) {
+      // Pulsating glow effect
+      const pulse = Math.sin(clock.getElapsedTime() * 2) * 0.2 + 0.8;
+      glowRef.current.scale.set(pulse, pulse, pulse);
+      
+      // Safely set opacity on the material
+      if (glowRef.current.material instanceof THREE.Material) {
+        (glowRef.current.material as THREE.Material & { opacity: number }).opacity = pulse * 0.3;
       }
     }
   });
@@ -85,6 +97,20 @@ export function Asteroid({
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
     >
+      {/* Hazardous glow effect */}
+      {/* @ts-expect-error r3f intrinsic */}
+      <mesh ref={glowRef}>
+        {/* @ts-expect-error r3f intrinsic */}
+        <sphereGeometry args={[size * 1.5, 16, 16]} />
+        {/* @ts-expect-error r3f intrinsic */}
+        <meshBasicMaterial 
+          color="#ff3300"
+          transparent
+          opacity={0.2}
+          side={THREE.BackSide}
+        />
+      </mesh>
+    
       {/* Asteroid body with irregular shape */}
       {/* @ts-expect-error r3f intrinsic */}
       <mesh>
@@ -94,10 +120,10 @@ export function Asteroid({
         {/* @ts-expect-error r3f intrinsic */}
         <meshStandardMaterial 
           color={color}
-          roughness={0.9}
-          metalness={0.1}
-          emissive={selected || hovered ? color : "#000"}
-          emissiveIntensity={selected ? 0.5 : hovered ? 0.3 : 0}
+          roughness={0.7}
+          metalness={0.3}
+          emissive={color}
+          emissiveIntensity={selected ? 0.6 : hovered ? 0.4 : 0.2}
         />
       </mesh>
 
@@ -106,10 +132,10 @@ export function Asteroid({
         // @ts-expect-error r3f intrinsic
         <mesh>
           {/* @ts-expect-error r3f intrinsic */}
-          <ringGeometry args={[size * 1.5, size * 1.6, 16]} />
+          <ringGeometry args={[size * 1.8, size * 1.9, 32]} />
           {/* @ts-expect-error r3f intrinsic */}
           <meshBasicMaterial 
-            color="#ffffff"
+            color="#ff5500"
             transparent
             opacity={0.6}
             side={THREE.DoubleSide}

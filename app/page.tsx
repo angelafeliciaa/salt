@@ -6,6 +6,7 @@ import SolarSystem, { SolarSystemControls } from "../components/SolarSystem";
 import useAsteroidManager from "../components/useAsteroidManager";
 import AsteroidInfo from "../components/AsteroidInfo";
 import AsteroidNavigation from "../components/AsteroidNavigation";
+import PageSelector from "../components/PageSelector";
 
 export default function HomePage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
@@ -22,11 +23,31 @@ export default function HomePage() {
     previousAsteroid,
     nextAsteroid,
     handleAsteroidClick,
-    totalAsteroids
+    totalAsteroids,
+    totalAsteroidsInDatabase,
+    hazardousAsteroidCount,
+    refreshAsteroids
   } = useAsteroidManager();
   
   return (
     <main style={{ width: "100vw", height: "100vh", position: "relative" }}>
+      {/* Warning banner for hazardous asteroids */}
+      {!loading && selectedAsteroid && (
+        <div className="warning-banner">
+          <span className="warning-icon">⚠️</span> 
+          Displaying potentially hazardous asteroid ({currentIndex + 1} of {hazardousAsteroidCount})
+          {totalAsteroidsInDatabase > hazardousAsteroidCount && 
+            ` from a total of ${totalAsteroidsInDatabase} NEO database asteroids`}
+        </div>
+      )}
+      
+      {/* Page Selector */}
+      <PageSelector
+        totalHazardous={hazardousAsteroidCount}
+        totalAsteroids={totalAsteroidsInDatabase}
+        isLoading={loading}
+      />
+      
       {/* Loading indicator */}
       {loading && (
         <div className="loading-indicator">
@@ -76,7 +97,8 @@ export default function HomePage() {
       {asteroids.length > 0 && !loading && (
         <AsteroidNavigation
           currentIndex={currentIndex}
-          totalAsteroids={totalAsteroids}
+          totalAsteroids={asteroids.length}
+          totalAsteroidsInDatabase={totalAsteroidsInDatabase}
           onPrevious={previousAsteroid}
           onNext={nextAsteroid}
         />
@@ -84,5 +106,4 @@ export default function HomePage() {
     </main>
   );
 }
-
 

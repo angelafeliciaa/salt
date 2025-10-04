@@ -251,16 +251,23 @@ export default function SolarSystem({
         />
       ))}
       
-      {/* Asteroids */}
-      {asteroids.map((asteroid, index) => (
-        <Asteroid
-          key={asteroid.id}
-          asteroid={asteroid}
-          position={asteroidPositions[index] || [0, 0, 0]}
-          selected={asteroid.id === selectedAsteroidId}
-          onClick={() => onAsteroidClick(asteroid)}
-        />
-      ))}
+      {/* Render only the selected asteroid */}
+      {(() => {
+        const selectedIndex = asteroids.findIndex(a => a.id === selectedAsteroidId);
+        if (selectedIndex >= 0) {
+          const selectedAsteroid = asteroids[selectedIndex];
+          return (
+            <Asteroid
+              key={selectedAsteroid.id}
+              asteroid={selectedAsteroid}
+              position={asteroidPositions[selectedIndex] || [0, 0, 0]}
+              selected={true}
+              onClick={() => onAsteroidClick(selectedAsteroid)}
+            />
+          );
+        }
+        return null;
+      })()}
       
       {/* Explosion effects */}
       {showExplosion && (
@@ -273,17 +280,18 @@ export default function SolarSystem({
       )}
       
       {/* Easter egg: Double-click anywhere to trigger an explosion */}
-      {/* @ts-expect-error r3f intrinsic */}
+      {/* @ts-ignore - r3f types */}
       <mesh 
         position={[0, 0, 0]} 
         scale={100} 
         visible={false} 
         onDoubleClick={triggerRandomExplosion}
       >
-        {/* @ts-expect-error r3f intrinsic */}
+        {/* @ts-ignore - r3f types */}
         <sphereGeometry args={[1, 8, 8]} />
-        {/* @ts-expect-error r3f intrinsic */}
+        {/* @ts-ignore - r3f types */}
         <meshBasicMaterial transparent opacity={0} />
+      {/* @ts-ignore - r3f types */}
       </mesh>
     </>
   );

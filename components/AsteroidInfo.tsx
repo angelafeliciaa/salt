@@ -10,19 +10,33 @@ interface AsteroidInfoProps {
 export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
   if (!asteroid) return null;
 
-  // Get the most recent close approach data
-  const latestApproach = asteroid.closeApproachData[0];
-
-  return (
+      // Get the most recent close approach data
+  const latestApproach = asteroid.closeApproachData && asteroid.closeApproachData.length > 0 
+    ? asteroid.closeApproachData[0] 
+    : null;  return (
     <div className="asteroid-info-panel">
       <h2 className="asteroid-name">{asteroid.name}</h2>
       
       <div className="hazard-indicator">
-        <span 
-          className={`hazard-badge ${asteroid.isPotentiallyHazardous ? 'hazardous' : 'safe'}`}
-        >
-          {asteroid.isPotentiallyHazardous ? 'Potentially Hazardous' : 'Not Hazardous'}
+        <span className="hazard-badge hazardous">
+          <span className="warning-icon">⚠️</span> 
+          Potentially Hazardous
         </span>
+      </div>
+      
+      <div className="danger-stats">
+        <div className="danger-stat">
+          <span className="danger-stat-label">Diameter</span>
+          <span className="danger-stat-value">{asteroid.diameter.avg.toFixed(2)} km</span>
+        </div>
+        <div className="danger-stat">
+          <span className="danger-stat-label">Velocity</span>
+          <span className="danger-stat-value">{parseFloat(latestApproach?.velocity.kmPerSecond || '0').toFixed(1)} km/s</span>
+        </div>
+        <div className="danger-stat">
+          <span className="danger-stat-label">Miss Distance</span>
+          <span className="danger-stat-value">{parseFloat(latestApproach?.missDistance.astronomical || '0').toFixed(3)} AU</span>
+        </div>
       </div>
 
       <div className="info-section">

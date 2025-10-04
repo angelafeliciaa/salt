@@ -72,10 +72,334 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
 	z-index: 10;
 }
 
+/* Asteroid Info Panel */
+.asteroid-info-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  background: rgba(6, 10, 28, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.asteroid-name {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+}
+
+.hazard-indicator {
+  margin-bottom: 15px;
+}
+
+.hazard-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.hazard-badge.hazardous {
+  background-color: rgba(255, 69, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  animation: pulse 2s infinite;
+}
+
+.hazard-badge.safe {
+  background-color: rgba(46, 204, 113, 0.7);
+  color: white;
+}
+
+.warning-icon {
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.danger-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+  background: rgba(255, 69, 0, 0.15);
+  border: 1px solid rgba(255, 69, 0, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.danger-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.danger-stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.danger-stat-value {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.info-section {
+  margin-bottom: 15px;
+}
+
+.info-section h3 {
+  font-size: 14px;
+  margin: 0 0 5px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.info-section p {
+  margin: 5px 0;
+  font-size: 13px;
+}
+
+.asteroid-id {
+  margin-top: 15px;
+  font-size: 11px;
+  opacity: 0.7;
+  text-align: right;
+}
+
+/* Asteroid Navigation */
+.asteroid-navigation {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(6, 10, 28, 0.8);
+  border: 1px solid rgba(255, 69, 0, 0.3);
+  border-radius: 10px;
+  padding: 12px;
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  box-shadow: 0 0 20px rgba(255, 69, 0, 0.2);
+}
+
+.hazardous-label {
+  background-color: rgba(255, 69, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  animation: pulse 2s infinite;
+}
+
+.navigation-controls {
+  display: flex;
+  align-items: center;
+}
+
+.nav-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.nav-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.asteroid-counter {
+  margin: 0 15px;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.total-count {
+  font-size: 12px;
+  font-weight: normal;
+  opacity: 0.7;
+  margin-left: 4px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* Warning Banner */
+.warning-banner {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 69, 0, 0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 15px rgba(255, 69, 0, 0.4);
+  z-index: 1000;
+  animation: pulse 2s infinite;
+}
+
+/* Page Selector */
+.page-selector {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  padding: 15px;
+  background-color: rgba(6, 10, 28, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: white;
+  z-index: 1000;
+  width: 280px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.page-selector h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.asteroid-stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 15px 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: rgba(255, 69, 0, 0.2);
+  border: 1px solid rgba(255, 69, 0, 0.4);
+  border-radius: 8px;
+  min-width: 100px;
+  box-shadow: 0 0 10px rgba(255, 69, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.stat-item.total {
+  background-color: rgba(0, 112, 243, 0.2);
+  border: 1px solid rgba(0, 112, 243, 0.4);
+  box-shadow: 0 0 10px rgba(0, 112, 243, 0.2);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 5px;
+}
+
+.refresh-note {
+  margin-top: 15px;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  color: #ddd;
+}
+
+.refresh-note p {
+  margin: 0;
+}
+
+.loading-indicator {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Loading and Error Messages */
+.loading-indicator, .error-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(6, 10, 28, 0.9);
+  padding: 20px 30px;
+  border-radius: 10px;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+.error-message {
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
 /* Responsive */
 @media (max-width: 720px) {
 	#info-panel { left: 16px; right: 16px; width: auto; }
 	.controls input[type="range"] { width: 120px; }
+  
+  .asteroid-info-panel {
+    top: auto;
+    bottom: 80px;
+    right: 10px;
+    width: calc(100% - 20px);
+    max-width: 400px;
+    max-height: 50vh;
+  }
+  
+  .asteroid-navigation {
+    bottom: 10px;
+    width: calc(100% - 20px);
+    justify-content: center;
+  }
+  
+  .page-selector {
+    top: auto;
+    bottom: 80px;
+    right: 10px;
+    width: calc(100% - 20px);
+    max-width: 400px;
+  }
 }
 
 

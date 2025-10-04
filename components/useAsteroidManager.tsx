@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AsteroidData } from "./Asteroid";
 import { calculateAsteroidPosition } from "../utils/asteroidPosition";
 
@@ -11,40 +11,67 @@ export function useAsteroidManager() {
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAsteroid, setSelectedAsteroid] = useState<AsteroidData | null>(null);
+  const [totalAsteroidCount, setTotalAsteroidCount] = useState<number>(0);
+  const [hazardousAsteroidCount, setHazardousAsteroidCount] = useState<number>(0);
   
   // Fetch asteroid data from our API
-  useEffect(() => {
-    async function fetchAsteroids() {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const startDate = `2025-01-01`;
-        
-        const response = await fetch(`/api/neo?start_date=${startDate}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch asteroid data');
-        }
-        
-        const data = await response.json();
-        
-        if (Array.isArray(data) && data.length > 0) {
-          setAsteroids(data);
-          setSelectedAsteroid(data[0]);
-        } else {
-          throw new Error('No asteroid data available');
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        console.error('Error fetching asteroid data:', err);
-      } finally {
-        setLoading(false);
+  const fetchAsteroids = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch only hazardous asteroids using API's filtering
+      const response = await fetch(`/api/neo?hazardous_only=true`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch asteroid data');
       }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Check if we have the new response format with metadata
+      if (data.asteroids && Array.isArray(data.asteroids)) {
+        if (data.asteroids.length > 0) {
+          setAsteroids(data.asteroids);
+          setSelectedAsteroid(data.asteroids[0]);
+          setCurrentIndex(0);
+          
+          // Set the metadata counts if available
+          if (data.metadata) {
+            setTotalAsteroidCount(data.metadata.totalCount || data.asteroids.length);
+            setHazardousAsteroidCount(data.metadata.hazardousCount || data.asteroids.length);
+          }
+        } else {
+          throw new Error('No potentially hazardous asteroids found');
+        }
+      } else if (Array.isArray(data) && data.length > 0) {
+        // Handle legacy response format
+        setAsteroids(data);
+        setSelectedAsteroid(data[0]);
+        setCurrentIndex(0);
+        setHazardousAsteroidCount(data.length);
+        setTotalAsteroidCount(data.length); // We don't know total in legacy format
+      } else {
+        throw new Error('No asteroid data available');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error fetching asteroid data:', err);
+      setAsteroids([]);
+      setSelectedAsteroid(null);
+    } finally {
+      setLoading(false);
     }
-    
-    fetchAsteroids();
   }, []);
+  
+  // Initial data fetch
+  useEffect(() => {
+    fetchAsteroids();
+  }, [fetchAsteroids]);
   
   // Navigate to previous asteroid
   const previousAsteroid = () => {
@@ -73,6 +100,11 @@ export function useAsteroidManager() {
     }
   };
   
+  // Manual refresh function
+  const refreshAsteroids = () => {
+    fetchAsteroids();
+  };
+  
   // Calculate positions for each asteroid
   const asteroidPositions = asteroids.map(asteroid => {
     // Use utility function to determine position
@@ -89,7 +121,10 @@ export function useAsteroidManager() {
     previousAsteroid,
     nextAsteroid,
     handleAsteroidClick,
-    totalAsteroids: asteroids.length
+    refreshAsteroids,
+    totalAsteroids: hazardousAsteroidCount,
+    totalAsteroidsInDatabase: totalAsteroidCount,
+    hazardousAsteroidCount
   };
 }
 
