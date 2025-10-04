@@ -5,6 +5,7 @@ import CartesianScene from "../components/CartesianScene";
 import SolarSystem, { SolarSystemControls } from "../components/SolarSystem";
 import useAsteroidManager from "../components/useAsteroidManager";
 import AsteroidInfo from "../components/AsteroidInfo";
+import AsteroidEnergy from "../components/AsteroidEnergy";
 import AsteroidNavigation from "../components/AsteroidNavigation";
 
 export default function HomePage() {
@@ -46,9 +47,9 @@ export default function HomePage() {
       
       {/* 3D Scene */}
       <CartesianScene 
-        gridSize={10} 
-        gridDivisions={10} 
-        cameraPosition={[8, 5, 8]}
+        gridSize={300} 
+        gridDivisions={30} 
+        cameraPosition={[180, 120, 180]}
         // No center sphere since the Sun will be at the origin
         originNode={null}
       >
@@ -69,6 +70,11 @@ export default function HomePage() {
         showLabels={showLabels}
         setShowLabels={setShowLabels}
       />
+      
+      {/* Asteroid Energy Panel (visible when asteroid is selected) */}
+      {selectedAsteroid && !loading && (
+        <AsteroidEnergy asteroid={selectedAsteroid} />
+      )}
       
       {/* Asteroid Info Panel (visible when asteroid is selected) */}
       {selectedAsteroid && !loading && (

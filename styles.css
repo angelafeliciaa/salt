@@ -373,6 +373,86 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
+/* Asteroid Energy Panel */
+.asteroid-energy-panel {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  width: 20%;
+  height: 30%;
+  background: rgba(255, 69, 0, 0.2);
+  border: 2px solid rgba(255, 165, 0, 0.8);
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(255, 165, 0, 0.6);
+  z-index: 2000; /* Make sure it's above everything */
+}
+
+.energy-title {
+  margin: 0 0 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff5e00;
+  border-bottom: 1px solid rgba(255, 94, 0, 0.4);
+  padding-bottom: 6px;
+}
+
+.energy-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.energy-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 69, 0, 0.15);
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.energy-stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.energy-stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff7f50;
+}
+
+.energy-comparison {
+  background: rgba(255, 69, 0, 0.2);
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 5px;
+}
+
+.comparison-label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.comparison-value {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffa07a;
+}
+
+.energy-disclaimer {
+  margin-top: 10px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
 /* Responsive */
 @media (max-width: 720px) {
 	#info-panel { left: 16px; right: 16px; width: auto; }
@@ -385,6 +465,14 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
     width: calc(100% - 20px);
     max-width: 400px;
     max-height: 50vh;
+  }
+  
+  .asteroid-energy-panel {
+    top: auto;
+    bottom: 140px;
+    left: 10px;
+    width: calc(100% - 20px);
+    max-width: 400px;
   }
   
   .asteroid-navigation {

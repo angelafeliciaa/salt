@@ -29,18 +29,18 @@ export type CartesianSceneProps = {
  * - Slots children so you can easily pop objects at any [x,y,z]
  */
 export function CartesianScene({
-  gridSize = 50,
-  gridDivisions = 50,
+  gridSize = 300,
+  gridDivisions = 30,
   showAxes = true,
   showGrids = true,
   background = "#0a0a0a",
-  cameraPosition = [8, 8, 8],
+  cameraPosition = [200, 150, 200],
   originNode,
   children,
 }: CartesianSceneProps) {
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <Canvas camera={{ position: cameraPosition, fov: 50 }} style={{ background }}>
+      <Canvas camera={{ position: cameraPosition, fov: 45, far: 10000 }} style={{ background }}>
 
         {/* IBL lighting */}
         {/* <Environment preset="city" /> */}
