@@ -165,6 +165,29 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
+.solutions-source {
+  color: #fff;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.solutions-source:hover {
+  text-decoration: underline;
+}
+
+.solutions-list a:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.asteroid-solutions-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+  background-color: rgba(6, 10, 28, 0.8);
+}
+
 .asteroid-name {
   font-size: 18px;
   margin-top: 0;
@@ -249,6 +272,21 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 .nav-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.solutions-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.solutions-list a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.solutions-list p {
+  font-size: 8px;
 }
 
 .asteroid-counter {
