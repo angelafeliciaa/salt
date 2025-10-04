@@ -4,6 +4,10 @@ import React, { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
+import EnhancedSun from "./EnhancedSun";
+import EnhancedPlanet from "./EnhancedPlanet";
+import Stars from "./Stars";
+import Explosion from "./Explosion";
 
 interface PlanetData {
   name: string;
@@ -70,34 +74,41 @@ export function Planet({
   animationSpeed?: number;
   showLabel?: boolean;
 }) {
-  // Create refs for the planet and its orbit
-  const planetRef = useRef<THREE.Group>(null);
-  const [hovered, setHovered] = useState(false);
-  
-  // Planetary spin and orbit animation
-  useFrame(({ clock }) => {
-    if (planetRef.current) {
-      // Calculate orbital position
-      const time = clock.getElapsedTime() * animationSpeed;
-      const orbitalSpeed = (2 * Math.PI) / planet.orbitalPeriod;
-      const angle = time * orbitalSpeed * 10; // Scale time for visual effect
-      
-      // Update position in orbit
-      const distance = planet.distance * EARTH_DISTANCE;
-      planetRef.current.position.x = Math.cos(angle) * distance;
-      planetRef.current.position.z = Math.sin(angle) * distance;
-      
-      // Planet rotation around its axis
-      const rotationSpeed = (2 * Math.PI) / planet.rotationPeriod;
-      planetRef.current.rotation.y += rotationSpeed * 0.01;
-    }
-  });
-  
   // Calculate planet size relative to Earth
   const size = planet.size * EARTH_SIZE;
   
   // Calculate orbit radius
   const orbitRadius = planet.distance * EARTH_DISTANCE;
+  
+  // Planet position refs for orbital animation
+  const [position, setPosition] = React.useState<[number, number, number]>([orbitRadius, 0, 0]);
+  
+  // Calculate orbital speed
+  const orbitalSpeed = (2 * Math.PI) / (planet.orbitalPeriod / 10) * animationSpeed;
+  
+  // Calculate rotation speed
+  const rotationSpeed = (2 * Math.PI) / (planet.rotationPeriod * 100);
+
+  // Check if planet has atmosphere
+  const hasAtmosphere = planet.name === "Earth" || planet.name === "Venus";
+  
+  // Choose appropriate atmosphere color
+  const atmosphereColor = planet.name === "Earth" ? "#4299e1" : 
+                         planet.name === "Venus" ? "#fbbf2480" : 
+                         undefined;
+                         
+  // Orbital animation
+  useFrame(({ clock }) => {
+    // Calculate orbital position
+    const time = clock.getElapsedTime() * animationSpeed;
+    const angle = time * (2 * Math.PI) / (planet.orbitalPeriod / 10);
+    
+    // Update position in orbit
+    const x = Math.cos(angle) * orbitRadius;
+    const z = Math.sin(angle) * orbitRadius;
+    
+    setPosition([x, 0, z]);
+  });
 
   return (
     <>
@@ -111,85 +122,29 @@ export function Planet({
       {/* @ts-expect-error r3f intrinsic */}
       </mesh>
       
-      {/* Planet sphere */}
-      {/* @ts-expect-error r3f intrinsic */}
-      <group 
-        ref={planetRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-      >
-        <Sphere args={[size, 32, 16]}>
-          {/* @ts-expect-error r3f intrinsic */}
-          <meshStandardMaterial
-            color={planet.color}
-            roughness={0.7}
-            metalness={0.1}
-            emissive={hovered ? planet.color : "#000000"}
-            emissiveIntensity={hovered ? 0.3 : 0}
-          />
-        </Sphere>
-        
-        {/* Planet label */}
-        {(showLabel || hovered) && (
-          <Billboard position={[0, size + 0.1, 0]}>
-            <Text
-              fontSize={0.12}
-              color="#ffffff"
-              anchorX="center"
-              anchorY="bottom"
-            >
-              {planet.name}
-            </Text>
-          </Billboard>
-        )}
-      {/* @ts-expect-error r3f intrinsic */}
-      </group>
+      {/* Planet with enhanced visuals */}
+      <EnhancedPlanet 
+        name={planet.name}
+        position={position}
+        size={size}
+        color={planet.color}
+        rotationSpeed={rotationSpeed}
+        hasAtmosphere={hasAtmosphere}
+        atmosphereColor={atmosphereColor}
+        showLabel={showLabel}
+      />
     </>
   );
 }
 
 export function Sun() {
-  const [hovered, setHovered] = useState(false);
-  
+  // We'll use EnhancedSun instead of basic sun implementation
   return (
-    /* @ts-expect-error r3f intrinsic */
-    <group
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      {/* The Sun - brighter, larger, and emissive */}
-      <Sphere 
-        args={[0.4, 32, 32]} 
-        position={[0, 0, 0]}
-      >
-        {/* @ts-expect-error r3f intrinsic */}
-        <meshStandardMaterial
-          color="#fde68a"
-          emissive="#fcd34d"
-          emissiveIntensity={hovered ? 4 : 2}
-          toneMapped={false}
-        />
-      </Sphere>
-      
-      {/* Sun label */}
-      {hovered && (
-        <Billboard position={[0, 0.6, 0]}>
-          <Text
-            fontSize={0.15}
-            color="#ffffff"
-            anchorX="center"
-            anchorY="bottom"
-          >
-            Sun
-          </Text>
-        </Billboard>
-      )}
-      
-      {/* Subtle glow effect */}
-      {/* @ts-expect-error r3f intrinsic */}
-      <pointLight position={[0, 0, 0]} intensity={2} color="#fffbeb" />
-    {/* @ts-expect-error r3f intrinsic */}
-    </group>
+    <EnhancedSun 
+      radius={0.4} 
+      position={[0, 0, 0]} 
+      intensity={3}
+    />
   );
 }
 
@@ -250,8 +205,28 @@ export default function SolarSystem({
   animationSpeed?: number;
   showLabels?: boolean;
 }) {
+  const [showExplosion, setShowExplosion] = useState(false);
+  const [explosionPosition, setExplosionPosition] = useState<[number, number, number]>([0, 0, 0]);
+
+  // Random explosion effect for fun
+  const triggerRandomExplosion = () => {
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 2 + Math.random() * 3;
+    const x = Math.cos(angle) * distance;
+    const z = Math.sin(angle) * distance;
+    
+    setExplosionPosition([x, 0, z]);
+    setShowExplosion(true);
+    
+    // Reset explosion after it completes
+    setTimeout(() => setShowExplosion(false), 2000);
+  };
+
   return (
     <>
+      {/* Background stars */}
+      <Stars count={5000} radius={100} starSize={0.15} />
+      
       {/* The Sun */}
       <Sun />
       
@@ -264,6 +239,30 @@ export default function SolarSystem({
           showLabel={showLabels}
         />
       ))}
+      
+      {/* Explosion effects */}
+      {showExplosion && (
+        <Explosion 
+          position={explosionPosition}
+          size={0.8}
+          duration={2}
+          onComplete={() => setShowExplosion(false)}
+        />
+      )}
+      
+      {/* Easter egg: Double-click anywhere to trigger an explosion */}
+      {/* @ts-expect-error r3f intrinsic */}
+      <mesh 
+        position={[0, 0, 0]} 
+        scale={100} 
+        visible={false} 
+        onDoubleClick={triggerRandomExplosion}
+      >
+        {/* @ts-expect-error r3f intrinsic */}
+        <sphereGeometry args={[1, 8, 8]} />
+        {/* @ts-expect-error r3f intrinsic */}
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
     </>
   );
 }

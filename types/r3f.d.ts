@@ -13,9 +13,20 @@ declare global {
       gridHelper: any;
       sphereGeometry: any;
       ringGeometry: any;
+      dodecahedronGeometry: any;
       meshStandardMaterial: any;
       meshBasicMaterial: any;
+      instancedMesh: any;
+      points: any;
+      sunShaderMaterial: any;
     }
   }
 }
+
+// Allow importing GLSL as strings
+declare module "*.glsl" {
+  const content: string;
+  export default content;
+}
+
 export {};
