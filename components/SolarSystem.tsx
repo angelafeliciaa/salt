@@ -168,7 +168,7 @@ export function SolarSystemControls({
   return (
     <div style={{
       position: 'absolute',
-      bottom: 20,
+      top: 20,
       left: 20,
       padding: '10px',
       backgroundColor: 'rgba(0,0,0,0.7)',

@@ -7,6 +7,7 @@ import useAsteroidManager from "../components/useAsteroidManager";
 import AsteroidInfo from "../components/AsteroidInfo";
 import AsteroidEnergy from "../components/AsteroidEnergy";
 import AsteroidNavigation from "../components/AsteroidNavigation";
+import Solutions from "components/Solutions";
 
 export default function HomePage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
@@ -81,6 +82,11 @@ export default function HomePage() {
         <AsteroidInfo asteroid={selectedAsteroid} />
       )}
       
+      {/* Solutions Panel (visible when asteroid is selected) */}
+      {selectedAsteroid && !loading && (
+        <Solutions asteroid={selectedAsteroid} />
+      )}
+
       {/* Navigation buttons (visible when there are asteroids) */}
       {asteroids.length > 0 && !loading && (
         <AsteroidNavigation
