@@ -8,10 +8,13 @@ declare global {
       group: any;
       ambientLight: any;
       directionalLight: any;
+      pointLight: any;
       axesHelper: any;
       gridHelper: any;
       sphereGeometry: any;
+      ringGeometry: any;
       meshStandardMaterial: any;
+      meshBasicMaterial: any;
     }
   }
 }
