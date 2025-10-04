@@ -18,15 +18,22 @@ const PlanetAtmosphere = ({ radius, color = "#4299e199" }: { radius: number; col
   );
 };
 
+type TextureInput = string | { src?: string } | null | undefined;
+
 interface EnhancedPlanetProps {
   name: string;
   position: [number, number, number];
   size: number;
   color: string;
   rotationSpeed?: number;
+  textureRotationSpeed?: number; // radians per second for map rotation
   hasAtmosphere?: boolean;
   atmosphereColor?: string;
-  textureUrl?: string;
+  textureUrl?: TextureInput;
+  normalMapUrl?: TextureInput;
+  bumpMapUrl?: TextureInput;
+  specularMapUrl?: TextureInput; // if provided, we will prefer Phong material
+  emissiveMapUrl?: TextureInput; // e.g., Earth's night lights
   showLabel?: boolean;
   onPointerOver?: () => void;
   onPointerOut?: () => void;
@@ -38,9 +45,14 @@ export function EnhancedPlanet({
   size,
   color,
   rotationSpeed = 0.005,
+  textureRotationSpeed = 0.0,
   hasAtmosphere = false,
   atmosphereColor,
   textureUrl,
+  normalMapUrl,
+  bumpMapUrl,
+  specularMapUrl,
+  emissiveMapUrl,
   showLabel = true,
   onPointerOver,
   onPointerOut
@@ -48,18 +60,85 @@ export function EnhancedPlanet({
   const planetRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = React.useState(false);
   
-  // Create texture if provided
-  const texture = useMemo(() => {
-    if (textureUrl) {
-      return new THREE.TextureLoader().load(textureUrl);
-    }
-    return null;
+  // Load textures as needed
+  const getUrl = (input?: TextureInput) => {
+    if (!input) return undefined;
+    if (typeof input === "string") return input;
+    if (typeof input === "object" && input.src) return input.src;
+    return undefined;
+  };
+
+  const colorMap = useMemo(() => {
+    const url = getUrl(textureUrl);
+    if (!url) return null;
+    const tex = new THREE.TextureLoader().load(url);
+    // Ensure correct color space for albedo maps on modern three
+    // @ts-ignore three versions may vary
+    tex.colorSpace = (THREE as any).SRGBColorSpace ?? (THREE as any).sRGBEncoding;
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
   }, [textureUrl]);
+
+  const normalMap = useMemo(() => {
+    const url = getUrl(normalMapUrl);
+    if (!url) return null;
+    const tex = new THREE.TextureLoader().load(url);
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }, [normalMapUrl]);
+
+  const bumpMap = useMemo(() => {
+    const url = getUrl(bumpMapUrl);
+    if (!url) return null;
+    const tex = new THREE.TextureLoader().load(url);
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }, [bumpMapUrl]);
+
+  const specularMap = useMemo(() => {
+    const url = getUrl(specularMapUrl);
+    if (!url) return null;
+    const tex = new THREE.TextureLoader().load(url);
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }, [specularMapUrl]);
+
+  const emissiveMap = useMemo(() => {
+    const url = getUrl(emissiveMapUrl);
+    if (!url) return null;
+    const tex = new THREE.TextureLoader().load(url);
+    tex.center.set(0.5, 0.5);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  }, [emissiveMapUrl]);
   
   // Planet rotation animation
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (planetRef.current) {
       planetRef.current.rotation.y += rotationSpeed;
+    }
+    if (textureRotationSpeed !== 0) {
+      const scrollMap = (tex: THREE.Texture | null) => {
+        if (!tex) return;
+        // Longitude spin: move U coordinate
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.offset.x = (tex.offset.x + textureRotationSpeed * delta) % 1;
+        tex.needsUpdate = true;
+      };
+      scrollMap(colorMap);
+      scrollMap(normalMap);
+      scrollMap(bumpMap);
+      scrollMap(specularMap);
+      scrollMap(emissiveMap);
     }
   });
   
@@ -85,21 +164,31 @@ export function EnhancedPlanet({
         castShadow 
         receiveShadow
       >
-        {texture ? (
-          <meshStandardMaterial 
-            map={texture} 
-            metalness={0.1} 
-            roughness={0.8}
-            emissive={hovered ? color : "#000000"}
-            emissiveIntensity={hovered ? 0.4 : 0}
+        {specularMap ? (
+          // Use Phong material when a specular map is provided
+          <meshPhongMaterial
+            map={colorMap ?? undefined}
+            color={colorMap ? undefined : (color as any)}
+            specularMap={specularMap}
+            specular={new THREE.Color('#222222') as any}
+            shininess={12}
+            normalMap={normalMap ?? undefined}
+            bumpMap={bumpMap ?? undefined}
+            emissiveMap={emissiveMap ?? undefined}
+            emissive={hovered ? (new THREE.Color(color) as any) : (new THREE.Color('#000000') as any)}
+            emissiveIntensity={hovered ? 0.35 : 0}
           />
         ) : (
           <meshStandardMaterial 
-            color={color} 
-            metalness={0.1} 
+            map={colorMap ?? undefined}
+            color={colorMap ? undefined : (color as any)}
+            normalMap={normalMap ?? undefined}
+            bumpMap={bumpMap ?? undefined}
+            emissiveMap={emissiveMap ?? undefined}
+            metalness={0.1}
             roughness={0.8}
-            emissive={hovered ? color : "#000000"}
-            emissiveIntensity={hovered ? 0.4 : 0}
+            emissive={hovered ? (new THREE.Color(color) as any) : (new THREE.Color('#000000') as any)}
+            emissiveIntensity={hovered ? 0.35 : 0}
           />
         )}
       </Sphere>

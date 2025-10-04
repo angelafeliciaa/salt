@@ -40,7 +40,7 @@ export function CartesianScene({
 }: CartesianSceneProps) {
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <Canvas camera={{ position: cameraPosition, fov: 45, far: 10000 }} style={{ background }}>
+      <Canvas camera={{ position: cameraPosition, fov: 45, near: 0.1, far: 100000 }} style={{ background }}>
 
         {/* IBL lighting */}
         {/* <Environment preset="city" /> */}
@@ -96,7 +96,18 @@ export function CartesianScene({
         {children}
 
         {/* Camera controls & gizmo */}
-        <OrbitControls makeDefault enableDamping dampingFactor={0.08} />
+        <OrbitControls
+          makeDefault
+          enableDamping
+          dampingFactor={0.08}
+          enableZoom
+          zoomSpeed={1.2}
+          enablePan
+          panSpeed={1.0}
+          screenSpacePanning
+          minDistance={0.1}
+          maxDistance={50000}
+        />
         <GizmoHelper alignment="bottom-right" margin={[80, 80] as any}>
           <GizmoViewport axisColors={["#ef4444", "#10b981", "#3b82f6"]} labelColor="white" />
         </GizmoHelper>

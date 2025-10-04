@@ -10,6 +10,33 @@ import Stars from "./Stars";
 import Explosion from "./Explosion";
 import Asteroid, { AsteroidData } from "./Asteroid";
 
+// Import texture assets from app/images so we get a build-time URL
+// Note: These files should exist based on your move
+// Mercury
+// @ts-ignore - Next will provide a URL string
+import mercuryMap from "../app/images/mercurymap.jpg";
+// @ts-ignore
+import mercuryBump from "../app/images/mercurybump.jpg";
+// Venus
+// @ts-ignore
+import venusMap from "../app/images/venusmap.jpg";
+// @ts-ignore
+import venusBump from "../app/images/venusbump.jpg";
+// Earth
+// @ts-ignore
+import earthDayMap from "../app/images/earth_daymap.jpg";
+// @ts-ignore
+import earthNightMap from "../app/images/earth_nightmap.jpg";
+// @ts-ignore
+import earthNormalMap from "../app/images/earth_normalmap.jpg";
+// @ts-ignore
+import earthSpecularMap from "../app/images/earth_specularmap.jpg";
+// Mars
+// @ts-ignore
+import marsMap from "../app/images/marsmap.jpg";
+// @ts-ignore
+import marsBump from "../app/images/marsbump.jpg";
+
 interface PlanetData {
   name: string;
   color: string;
@@ -66,6 +93,14 @@ const EARTH_SIZE = 0.15; // Visual size in the scene
 const EARTH_DISTANCE = 2.5; // Distance from Sun in scene units
 const ANIMATION_SPEED = 0.5; // Higher values = faster orbits
 
+// Map planet names to imported texture URLs
+const PLANET_TEXTURES: Record<string, string> = {
+  Mercury: mercuryMap as unknown as string,
+  Venus: venusMap as unknown as string,
+  Earth: earthDayMap as unknown as string,
+  Mars: marsMap as unknown as string,
+};
+
 export function Planet({
   planet,
   animationSpeed = ANIMATION_SPEED,
@@ -81,8 +116,8 @@ export function Planet({
   // Calculate orbit radius
   const orbitRadius = planet.distance * EARTH_DISTANCE;
   
-  // Planet position refs for orbital animation
-  const [position, setPosition] = React.useState<[number, number, number]>([orbitRadius, 0, 0]);
+  // Planet position refs for orbital animation (avoid React state each frame)
+  const positionRef = useRef<[number, number, number]>([orbitRadius, 0, 0]);
   
   // Calculate orbital speed
   const orbitalSpeed = (2 * Math.PI) / (planet.orbitalPeriod / 10) * animationSpeed;
@@ -108,7 +143,7 @@ export function Planet({
     const x = Math.cos(angle) * orbitRadius;
     const z = Math.sin(angle) * orbitRadius;
     
-    setPosition([x, 0, z]);
+    positionRef.current = [x, 0, z];
   });
 
   return (
@@ -137,12 +172,22 @@ export function Planet({
       {/* Planet with enhanced visuals */}
       <EnhancedPlanet 
         name={planet.name}
-        position={position}
+        position={positionRef.current}
         size={size}
         color={planet.color}
         rotationSpeed={rotationSpeed}
+        textureRotationSpeed={rotationSpeed}
         hasAtmosphere={hasAtmosphere}
         atmosphereColor={atmosphereColor}
+        textureUrl={PLANET_TEXTURES[planet.name]}
+        {...(planet.name === 'Earth' ? {
+          normalMapUrl: earthNormalMap as unknown as string,
+          specularMapUrl: earthSpecularMap as unknown as string,
+          // No emissive/night map so Earth always shows the day texture
+        } : {})}
+        {...(planet.name === 'Mercury' ? { bumpMapUrl: mercuryBump as unknown as string } : {})}
+        {...(planet.name === 'Venus' ? { bumpMapUrl: venusBump as unknown as string } : {})}
+        {...(planet.name === 'Mars' ? { bumpMapUrl: marsBump as unknown as string } : {})}
         showLabel={showLabel}
       />
     </>

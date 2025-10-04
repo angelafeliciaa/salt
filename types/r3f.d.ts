@@ -16,6 +16,7 @@ declare module "react" {
       dodecahedronGeometry: any;
       meshStandardMaterial: any;
       meshBasicMaterial: any;
+      meshPhongMaterial: any;
       instancedMesh: any;
       points: any;
       sunShaderMaterial: any;
@@ -31,3 +32,17 @@ declare module "*.glsl" {
 }
 
 export {};
+
+// Allow importing image assets and getting a URL string
+declare module "*.jpg" {
+  const src: string;
+  export default src;
+}
+declare module "*.jpeg" {
+  const src: string;
+  export default src;
+}
+declare module "*.png" {
+  const src: string;
+  export default src;
+}

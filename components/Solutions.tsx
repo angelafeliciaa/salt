@@ -86,8 +86,7 @@ export function Solutions({ asteroid }: SolutionsProps) {
   const isNuclearSolvable = asteroid.diameter.avg < AsteroidSize.VERY_DANGEROUSLY_LARGE;
   return (
     <div className="asteroid-solutions-panel">
-      <h1>Solutions</h1>
-      <h2 className="asteroid-name">{asteroid.name}</h2>
+      <h2 className="asteroid-name">Solutions</h2>
       <ul className="solutions-list">
         <li>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
