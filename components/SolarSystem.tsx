@@ -8,6 +8,7 @@ import EnhancedSun from "./EnhancedSun";
 import EnhancedPlanet from "./EnhancedPlanet";
 import Stars from "./Stars";
 import Explosion from "./Explosion";
+import Asteroid, { AsteroidData } from "./Asteroid";
 
 interface PlanetData {
   name: string;
@@ -198,13 +199,23 @@ export function SolarSystemControls({
   );
 }
 
-export default function SolarSystem({
-  animationSpeed = ANIMATION_SPEED,
-  showLabels = true
-}: {
+interface SolarSystemProps {
   animationSpeed?: number;
   showLabels?: boolean;
-}) {
+  asteroids?: AsteroidData[];
+  asteroidPositions?: [number, number, number][];
+  selectedAsteroidId?: string;
+  onAsteroidClick?: (asteroid: AsteroidData) => void;
+}
+
+export default function SolarSystem({
+  animationSpeed = ANIMATION_SPEED,
+  showLabels = true,
+  asteroids = [],
+  asteroidPositions = [],
+  selectedAsteroidId = "",
+  onAsteroidClick = () => {}
+}: SolarSystemProps) {
   const [showExplosion, setShowExplosion] = useState(false);
   const [explosionPosition, setExplosionPosition] = useState<[number, number, number]>([0, 0, 0]);
 
@@ -237,6 +248,17 @@ export default function SolarSystem({
           planet={planet} 
           animationSpeed={animationSpeed}
           showLabel={showLabels}
+        />
+      ))}
+      
+      {/* Asteroids */}
+      {asteroids.map((asteroid, index) => (
+        <Asteroid
+          key={asteroid.id}
+          asteroid={asteroid}
+          position={asteroidPositions[index] || [0, 0, 0]}
+          selected={asteroid.id === selectedAsteroidId}
+          onClick={() => onAsteroidClick(asteroid)}
         />
       ))}
       
