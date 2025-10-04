@@ -78,6 +78,7 @@ export function Stars({
       <dodecahedronGeometry args={[1, 0]} />
       {/* @ts-expect-error r3f intrinsic */}
       <meshBasicMaterial color={starColor} />
+      {/* @ts-expect-error r3f intrinsic */}
     </instancedMesh>
   );
 }

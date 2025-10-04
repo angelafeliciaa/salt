@@ -109,6 +109,7 @@ export function Asteroid({
           opacity={0.2}
           side={THREE.BackSide}
         />
+        {/* @ts-expect-error r3f intrinsic */}
       </mesh>
     
       {/* Asteroid body with irregular shape */}
@@ -125,6 +126,7 @@ export function Asteroid({
           emissive={color}
           emissiveIntensity={selected ? 0.6 : hovered ? 0.4 : 0.2}
         />
+        {/* @ts-expect-error r3f intrinsic */}
       </mesh>
 
       {/* Selection indicator */}
@@ -140,6 +142,7 @@ export function Asteroid({
             opacity={0.6}
             side={THREE.DoubleSide}
           />
+          {/* @ts-expect-error r3f intrinsic */}
         </mesh>
       )}
       
@@ -158,6 +161,7 @@ export function Asteroid({
           </Text>
         </Billboard>
       )}
+      {/* @ts-expect-error r3f intrinsic */}
     </group>
   );
 }

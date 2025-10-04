@@ -6,7 +6,7 @@ import { Sphere, Billboard, Text } from "@react-three/drei";
 import * as THREE from "three";
 
 // Create a simple atmosphere effect for Earth
-const PlanetAtmosphere = ({ radius, color = "#4299e199" }) => {
+const PlanetAtmosphere = ({ radius, color = "#4299e199" }: { radius: number; color?: string }) => {
   return (
     <Sphere args={[radius * 1.05, 32, 16]} position={[0, 0, 0]}>
       {/* @ts-expect-error r3f intrinsic */}
@@ -127,6 +127,7 @@ export function EnhancedPlanet({
           </Text>
         </Billboard>
       )}
+      {/* @ts-expect-error r3f intrinsic */}
     </group>
   );
 }

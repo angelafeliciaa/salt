@@ -181,6 +181,7 @@ const SunGlow = ({ scale = 1.2, intensity = 0.15 }) => {
         side={THREE.BackSide}
         blending={THREE.AdditiveBlending}
       />
+      {/* @ts-expect-error r3f intrinsic */}
     </mesh>
   );
 };interface EnhancedSunProps {
@@ -232,6 +233,7 @@ export function EnhancedSun({
         color="#fffbeb"
         castShadow
       />
+      {/* @ts-expect-error r3f intrinsic */}
     </group>
   );
 }
