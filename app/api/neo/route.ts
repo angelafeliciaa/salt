@@ -1,83 +1,117 @@
 import { NextRequest, NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse/sync';
 
 export async function GET(request: NextRequest) {
-  // Get NASA API key from environment variables
-  const NASA_API_KEY = process.env.NASA_API_KEY || 'DEMO_KEY';
-  
-  // Log that we're using the environment variable (remove in production)
-  console.log(`Using NASA API Key: ${NASA_API_KEY.substring(0, 4)}... (from environment)`);
+  console.log('Reading asteroid data from CSV file');
   
   try {
     // Get parameters
     const { searchParams } = new URL(request.url);
-    const hazardousOnly = searchParams.get('hazardous_only') !== 'false'; // Default to true
-    const maxPages = 10; // Maximum number of pages to fetch
+    // Define the path to the CSV file
+    const csvFilePath = path.join(process.cwd(), 'app', 'api', 'neo', 'sbdb_query_results.csv');
     
-    // Collect all asteroids from multiple pages
+    // Read the CSV file
+    const fileContent = fs.readFileSync(csvFilePath, 'utf-8');
+    
+    // Parse the CSV data
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
+      relax_quotes: true,
+      relax_column_count: true
+    });
+    
+    // Take only the first 100 records
+    const limitedRecords = records.slice(0, 100);
+    
+    console.log(`Read ${limitedRecords.length} asteroid records from CSV file`);
+    
+    // Transform CSV data to match our expected format
     let allNeos: any[] = [];
     let errorOccurred = false;
     
-    // Fetch multiple pages of data
-    for (let page = 0; page < maxPages; page++) {
-      try {
-        console.log(`Fetching NEO data page ${page}: ${`https://api.nasa.gov/neo/rest/v1/neo/browse?page=${page}&api_key=${NASA_API_KEY}`}`);
+    try {
+      allNeos = limitedRecords.map((record: any) => {
+        // Determine if asteroid is potentially hazardous
+        // In the CSV, "pha" column has Y for potentially hazardous
+        const isPotentiallyHazardous = record.pha === 'Y';
         
-        // Fetch data from NASA API
-        const response = await fetch(
-          `https://api.nasa.gov/neo/rest/v1/neo/browse?page=${page}&api_key=${NASA_API_KEY}`
-        );
+        // Parse diameter value (could be empty in CSV)
+        const diameterValue = parseFloat(record.diameter) || 0;
         
-        if (!response.ok) {
-          console.error(`NASA API responded with status: ${response.status} for page ${page}`);
-          errorOccurred = true;
-          break;
-        }
+        // Calculate a range for diameter (±15% of value as an approximation)
+        const minDiameter = diameterValue * 0.85;
+        const maxDiameter = diameterValue * 1.15;
         
-        const data = await response.json();
+        // Convert AU to kilometers - 1 AU = 149,597,870.7 kilometers
+        const moidKm = (parseFloat(record.moid || '0') * 149597870.7).toFixed(0);
         
-        // Add the current page's NEOs to our collection
-        if (data.near_earth_objects && Array.isArray(data.near_earth_objects)) {
-          allNeos = [...allNeos, ...data.near_earth_objects];
-        } else {
-          console.error(`Invalid data format for page ${page}`);
-          errorOccurred = true;
-          break;
-        }
+        // Get orbital period data from 'per' (days) and 'per_y' (years) columns
+        const orbitalPeriodDays = parseFloat(record.per) || 0;
+        const orbitalPeriodYears = parseFloat(record.per_y) || 0;
         
-        // Check if we've reached the end of the data
-        if (!data.page.total_pages || page >= data.page.total_pages - 1) {
-          break;
-        }
-      } catch (err) {
-        console.error(`Error fetching page ${page}:`, err);
-        errorOccurred = true;
-        break;
-      }
+        return {
+          id: record.spkid,
+          name: record.name ? record.name : record.full_name.trim(),
+          estimated_diameter: {
+            kilometers: {
+              estimated_diameter_min: minDiameter,
+              estimated_diameter_max: maxDiameter
+            }
+          },
+          is_potentially_hazardous_asteroid: isPotentiallyHazardous,
+          close_approach_data: [
+            {
+              // Use orbital period instead of close approach date
+              orbital_period: {
+                days: orbitalPeriodDays.toFixed(1),
+                years: orbitalPeriodYears.toFixed(2)
+              },
+              relative_velocity: {
+                kilometers_per_second: (parseFloat(record.q) * 30).toFixed(2), // Approximating velocity based on q
+                kilometers_per_hour: (parseFloat(record.q) * 108000).toFixed(2)
+              },
+              miss_distance: {
+                astronomical: record.moid || '0',
+                kilometers: moidKm
+              },
+              orbiting_body: 'Earth'
+            }
+          ],
+          orbital_data: {
+            orbit_id: record.orbit_id || 'Unknown',
+            orbit_determination_date: record.epoch_cal || 'Unknown',
+            first_observation_date: record.first_obs || 'Unknown',
+            last_observation_date: record.last_obs || 'Unknown',
+            data_arc_in_days: record.data_arc || 0,
+            orbit_class: {
+              orbit_class_type: record.class || 'Unknown'
+            }
+          }
+        };
+      });
+    } catch (err) {
+      console.error('Error processing CSV data:', err);
+      errorOccurred = true;
     }
     
     if (allNeos.length === 0) {
       if (errorOccurred) {
-        return NextResponse.json({ error: 'Error fetching asteroid data' }, { status: 500 });
+        return NextResponse.json({ error: 'Error reading asteroid data from CSV' }, { status: 500 });
       } else {
-        return NextResponse.json({ error: 'No asteroid data available' }, { status: 404 });
+        return NextResponse.json({ error: 'No asteroid data available in CSV' }, { status: 404 });
       }
     }
     
-    console.log(`Fetched ${allNeos.length} total asteroids from NASA API`);
+    console.log(`Processed ${allNeos.length} total asteroids from CSV file`);
     
-    // Apply filtering
+    // Apply filtering only if explicitly requested
     let filteredNeos = allNeos;
-    if (hazardousOnly) {
-      filteredNeos = allNeos.filter((neo: any) => neo.is_potentially_hazardous_asteroid);
-      
-      if (filteredNeos.length === 0) {
-        return NextResponse.json({ error: 'No potentially hazardous asteroids found' }, { status: 404 });
-      }
-      
-      console.log(`Filtered to ${filteredNeos.length} potentially hazardous asteroids out of ${allNeos.length} total`);
-    }
-    
-      // Process the data to extract only the information we need
+
+    // Process the data to extract only the information we need (same structure as before)
     const processedNeos = filteredNeos.map((neo: any) => ({
       id: neo.id,
       name: neo.name,
@@ -90,7 +124,11 @@ export async function GET(request: NextRequest) {
       },
       isPotentiallyHazardous: neo.is_potentially_hazardous_asteroid || false,
       closeApproachData: (neo.close_approach_data || []).map((approach: any) => ({
-        date: approach.close_approach_date || 'Unknown',
+        // Include orbital period instead of date
+        orbitalPeriod: {
+          days: approach.orbital_period?.days || '0',
+          years: approach.orbital_period?.years || '0',
+        },
         velocity: {
           kmPerSecond: approach.relative_velocity?.kilometers_per_second || '0',
           kmPerHour: approach.relative_velocity?.kilometers_per_hour || '0',
@@ -109,17 +147,20 @@ export async function GET(request: NextRequest) {
         dataArcInDays: neo.orbital_data?.data_arc_in_days || 0,
         orbitClass: neo.orbital_data?.orbit_class?.orbit_class_type || 'Unknown',
       }
-    }));    console.log(`Returning ${processedNeos.length} potentially hazardous asteroids`);
+    }));
+    
+    console.log(`Returning ${processedNeos.length} asteroids from CSV data`);
     return NextResponse.json({
       asteroids: processedNeos,
       metadata: {
         totalCount: allNeos.length,
-        hazardousCount: filteredNeos.length
+        hazardousCount: filteredNeos.length,
+        source: 'CSV file (first 100 records)'
       }
     });
     
   } catch (error) {
-    console.error('Error fetching NEO data:', error);
-    return NextResponse.json({ error: 'Failed to fetch NEO data' }, { status: 500 });
+    console.error('Error processing CSV data:', error);
+    return NextResponse.json({ error: 'Failed to process asteroid data from CSV' }, { status: 500 });
   }
 }

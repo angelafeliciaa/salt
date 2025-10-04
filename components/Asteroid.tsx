@@ -16,6 +16,10 @@ export interface AsteroidData {
   };
   isPotentiallyHazardous: boolean;
   closeApproachData: {
+    orbitalPeriod?: {
+      days: string;
+      years: string;
+    };
     date: string;
     velocity: {
       kmPerSecond: string;

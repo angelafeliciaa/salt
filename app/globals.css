@@ -67,6 +67,56 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 	z-index: 10;
 }
 
+/* Danger Stats for Asteroid Info */
+.danger-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Hazardous asteroid */
+.danger-stats.hazardous {
+  background: rgba(255, 69, 0, 0.15);
+  border: 1px solid rgba(255, 69, 0, 0.3);
+}
+
+/* Non-hazardous asteroid */
+.danger-stats.safe {
+  background: rgba(46, 204, 113, 0.15);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.danger-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.danger-stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.danger-stat-value {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Hazardous values */
+.hazardous .danger-stat-value {
+  color: #ff7f50;
+}
+
+/* Safe values */
+.safe .danger-stat-value {
+  color: #2ecc71;
+}
+
 @media (max-width: 720px) {
 	#info-panel { left: 16px; right: 16px; width: auto; }
 	.controls input[type="range"] { width: 120px; }
@@ -264,25 +314,89 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   left: 20px;
   width: 340px;
   max-width: calc(100% - 40px);
-  background: rgba(255, 69, 0, 0.2);
-  border: 2px solid rgba(255, 165, 0, 0.8);
+  background: rgba(20, 20, 30, 0.85);
   border-radius: 12px;
   padding: 15px;
   color: white;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(255, 165, 0, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   z-index: 2000; /* Make sure it's above everything */
   overflow: auto;
   max-height: calc(100vh - 160px);
+}
+
+/* Non-hazardous asteroid */
+.non-hazardous.asteroid-energy-panel {
+  border: 2px solid rgba(30, 144, 255, 0.8);
+}
+
+/* Hazardous asteroid levels */
+.negligible.asteroid-energy-panel {
+  border: 2px solid rgba(13, 152, 186, 0.8);
+}
+
+.minor.asteroid-energy-panel {
+  border: 2px solid rgba(8, 180, 92, 0.8);
+}
+
+.moderate.asteroid-energy-panel {
+  border: 2px solid rgba(254, 192, 7, 0.8);
+}
+
+.significant.asteroid-energy-panel,
+.major.asteroid-energy-panel {
+  border: 2px solid rgba(255, 128, 0, 0.8);
+}
+
+.severe.asteroid-energy-panel {
+  border: 2px solid rgba(220, 53, 69, 0.8);
+}
+
+.catastrophic.asteroid-energy-panel,
+.extinction.asteroid-energy-panel {
+  border: 2px solid rgba(108, 17, 40, 0.9);
 }
 
 .energy-title {
   margin: 0 0 10px;
   font-size: 16px;
   font-weight: bold;
-  color: #ff5e00;
-  border-bottom: 1px solid rgba(255, 94, 0, 0.4);
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 6px;
+}
+
+/* Title colors for different hazard levels */
+.negligible .energy-title {
+  color: #0d98ba;
+  border-bottom-color: rgba(13, 152, 186, 0.4);
+}
+
+.minor .energy-title {
+  color: #08b45c;
+  border-bottom-color: rgba(8, 180, 92, 0.4);
+}
+
+.moderate .energy-title {
+  color: #fec007;
+  border-bottom-color: rgba(254, 192, 7, 0.4);
+}
+
+.significant .energy-title,
+.major .energy-title {
+  color: #ff8000;
+  border-bottom-color: rgba(255, 128, 0, 0.4);
+}
+
+.severe .energy-title {
+  color: #dc3545;
+  border-bottom-color: rgba(220, 53, 69, 0.4);
+}
+
+.catastrophic .energy-title,
+.extinction .energy-title {
+  color: #ff3021;
+  border-bottom-color: rgba(255, 48, 33, 0.4);
 }
 
 .energy-stats {
@@ -296,7 +410,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 69, 0, 0.15);
+  background: rgba(20, 20, 30, 0.5);
   padding: 8px 12px;
   border-radius: 6px;
 }
@@ -309,21 +423,110 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 .energy-stat-value {
   font-size: 16px;
   font-weight: bold;
-  color: #ff7f50;
+  color: white;
+}
+
+/* Color schemes for different hazard levels */
+.negligible .energy-stat-value {
+  color: #0d98ba;
+}
+
+.minor .energy-stat-value {
+  color: #08b45c;
+}
+
+.moderate .energy-stat-value {
+  color: #fec007;
+}
+
+.significant .energy-stat-value,
+.major .energy-stat-value {
+  color: #ff8000;
+}
+
+.severe .energy-stat-value {
+  color: #dc3545;
+}
+
+.catastrophic .energy-stat-value,
+.extinction .energy-stat-value {
+  color: #ff3021;
 }
 
 .energy-comparisons {
-  background: rgba(255, 69, 0, 0.2);
+  background: rgba(20, 20, 30, 0.4);
   border-radius: 6px;
   padding: 10px;
   margin-top: 10px;
 }
 
+.hazard-level-indicator {
+  text-align: center;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: white;
+  font-size: 1.2rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.negligible .hazard-level-indicator {
+  background-color: rgba(13, 152, 186, 0.8);
+}
+
+.minor .hazard-level-indicator {
+  background-color: rgba(8, 180, 92, 0.8);
+}
+
+.moderate .hazard-level-indicator {
+  background-color: rgba(254, 192, 7, 0.8);
+}
+
+.significant .hazard-level-indicator {
+  background-color: rgba(255, 128, 0, 0.8);
+}
+
+.severe .hazard-level-indicator {
+  background-color: rgba(220, 53, 69, 0.8);
+}
+
+.catastrophic .hazard-level-indicator {
+  background-color: rgba(108, 17, 40, 0.9);
+}
+
 .comparisons-title {
   font-size: 14px;
   font-weight: bold;
-  color: #ffa07a;
+  color: white;
   margin: 0 0 8px 0;
+}
+
+/* Comparison title colors for different hazard levels */
+.negligible .comparisons-title {
+  color: #0d98ba;
+}
+
+.minor .comparisons-title {
+  color: #08b45c;
+}
+
+.moderate .comparisons-title {
+  color: #fec007;
+}
+
+.significant .comparisons-title,
+.major .comparisons-title {
+  color: #ff8000;
+}
+
+.severe .comparisons-title {
+  color: #dc3545;
+}
+
+.catastrophic .comparisons-title,
+.extinction .comparisons-title {
+  color: #ff3021;
 }
 
 .comparisons-list {
@@ -344,7 +547,34 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   content: "•";
   position: absolute;
   left: 2px;
-  color: #ffa07a;
+  color: white;
+}
+
+/* Comparison bullet colors for different hazard levels */
+.negligible .comparison-item:before {
+  color: #0d98ba;
+}
+
+.minor .comparison-item:before {
+  color: #08b45c;
+}
+
+.moderate .comparison-item:before {
+  color: #fec007;
+}
+
+.significant .comparison-item:before,
+.major .comparison-item:before {
+  color: #ff8000;
+}
+
+.severe .comparison-item:before {
+  color: #dc3545;
+}
+
+.catastrophic .comparison-item:before,
+.extinction .comparison-item:before {
+  color: #ff3021;
 }
 
 .comparison-item:last-child {
@@ -359,7 +589,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 }
 
 .detail-item {
-  background: rgba(255, 69, 0, 0.1);
+  background: rgba(20, 20, 30, 0.5);
   border-radius: 4px;
   padding: 6px 10px;
   display: flex;
@@ -375,7 +605,34 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 .detail-value {
   font-size: 13px;
   font-weight: bold;
-  color: #ffa07a;
+  color: white;
+}
+
+/* Detail value colors for different hazard levels */
+.negligible .detail-value {
+  color: #0d98ba;
+}
+
+.minor .detail-value {
+  color: #08b45c;
+}
+
+.moderate .detail-value {
+  color: #fec007;
+}
+
+.significant .detail-value,
+.major .detail-value {
+  color: #ff8000;
+}
+
+.severe .detail-value {
+  color: #dc3545;
+}
+
+.catastrophic .detail-value,
+.extinction .detail-value {
+  color: #ff3021;
 }
 
 .energy-disclaimer {

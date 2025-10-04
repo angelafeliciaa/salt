@@ -5,6 +5,7 @@ import { AsteroidData } from "./Asteroid";
 import { 
   calculateKineticEnergy,
   calculateAsteroidMass,
+  getAsteroidDensity,
   joulestoTNT, 
   formatEnergy, 
   formatTNT,
@@ -33,9 +34,31 @@ export function AsteroidEnergy({ asteroid }: AsteroidEnergyProps) {
   // Get multiple comparisons for better context
   const multipleComparisons = getMultipleComparisons(tntEquivalent);
 
+  // Determine hazard level based on TNT equivalent
+  const getHazardLevel = (megatons: number): string => {
+    if (megatons >= 100000) return "extinction"; // Extinction-level event
+    if (megatons >= 10000) return "global"; // Global catastrophe
+    if (megatons >= 1000) return "continental"; // Continental devastation
+    if (megatons >= 100) return "catastrophic"; // Regional catastrophe
+    if (megatons >= 10) return "severe"; // Severe regional damage
+    if (megatons >= 1) return "major"; // Major city destruction
+    if (megatons >= 0.1) return "significant"; // Significant local damage
+    if (megatons >= 0.01) return "moderate"; // Moderate damage
+    if (megatons >= 0.001) return "minor"; // Minor damage
+    return "negligible"; // Negligible damage
+  };
+
+  const hazardLevel = getHazardLevel(tntEquivalent);
+  const isHazardous = asteroid.isPotentiallyHazardous;
+
   return (
-    <div className="asteroid-energy-panel">
+    <div className={`asteroid-energy-panel hazard-${hazardLevel} ${isHazardous ? 'hazardous' : 'non-hazardous'}`}>
       <h3 className="energy-title">Impact Energy</h3>
+      
+      <div className="hazard-level-indicator">
+        <div className={`hazard-indicator-bar hazard-${hazardLevel}`}></div>
+        <span className="hazard-level-label">{hazardLevel.charAt(0).toUpperCase() + hazardLevel.slice(1)} Impact</span>
+      </div>
       
       <div className="energy-stats">
         <div className="energy-stat">
@@ -66,6 +89,12 @@ export function AsteroidEnergy({ asteroid }: AsteroidEnergyProps) {
           </span>
         </div>
         <div className="detail-item">
+          <span className="detail-label">Estimated Density</span>
+          <span className="detail-value">
+            {getAsteroidDensity(asteroid).toLocaleString()} kg/m³
+          </span>
+        </div>
+        <div className="detail-item">
           <span className="detail-label">Impact Velocity</span>
           <span className="detail-value">
             {parseFloat(asteroid.closeApproachData[0].velocity.kmPerSecond).toFixed(2)} km/s
@@ -74,7 +103,7 @@ export function AsteroidEnergy({ asteroid }: AsteroidEnergyProps) {
       </div>
       
       <div className="energy-disclaimer">
-        <small>*Calculations based on estimated diameter, average density (3000 kg/m³), and velocity</small>
+        <small>*Calculations based on estimated diameter, composition-based density, and velocity</small>
       </div>
     </div>
   );

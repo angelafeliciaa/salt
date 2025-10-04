@@ -18,13 +18,20 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
       <h2 className="asteroid-name">{asteroid.name}</h2>
       
       <div className="hazard-indicator">
-        <span className="hazard-badge hazardous">
-          <span className="warning-icon">⚠️</span> 
-          Potentially Hazardous
-        </span>
+        {asteroid.isPotentiallyHazardous ? (
+          <span className="hazard-badge hazardous">
+            <span className="warning-icon">⚠️</span> 
+            Potentially Hazardous
+          </span>
+        ) : (
+          <span className="hazard-badge safe">
+            <span className="safe-icon">✓</span> 
+            Non-Hazardous
+          </span>
+        )}
       </div>
       
-      <div className="danger-stats">
+      <div className={`danger-stats ${asteroid.isPotentiallyHazardous ? 'hazardous' : 'safe'}`}>
         <div className="danger-stat">
           <span className="danger-stat-label">Diameter</span>
           <span className="danger-stat-value">{asteroid.diameter.avg.toFixed(2)} km</span>
@@ -53,7 +60,7 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
 
       <div className="info-section">
         <h3>Close Approach Data</h3>
-        <p>Date: {latestApproach?.date || 'Unknown'}</p>
+        <p>Period: {latestApproach?.orbitalPeriod?.days || 'Unknown'} days</p>
         <p>Velocity: {parseFloat(latestApproach?.velocity.kmPerSecond || '0').toFixed(2)} km/s</p>
         <p>Miss Distance: {parseFloat(latestApproach?.missDistance.astronomical || '0').toFixed(6)} AU</p>
         <p>({parseFloat(latestApproach?.missDistance.kilometers || '0').toLocaleString()} km)</p>

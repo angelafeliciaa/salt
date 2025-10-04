@@ -378,16 +378,79 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   position: fixed;
   top: 80px;
   left: 20px;
-  width: 20%;
-  height: 30%;
-  background: rgba(255, 69, 0, 0.2);
-  border: 2px solid rgba(255, 165, 0, 0.8);
+  width: 320px;
+  background: rgba(6, 10, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 15px;
   color: white;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(255, 165, 0, 0.6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   z-index: 2000; /* Make sure it's above everything */
+}
+
+/* Hazard Level Styling */
+.hazard-level-indicator {
+  margin: 10px 0 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hazard-indicator-bar {
+  height: 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Hazard Level Colors */
+.hazard-negligible .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+}
+
+.hazard-minor .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #2ecc71, #f1c40f);
+}
+
+.hazard-moderate .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #f1c40f, #e67e22);
+}
+
+.hazard-significant .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #e67e22, #e74c3c);
+}
+
+.hazard-major .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.hazard-severe .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #c0392b, #8e44ad);
+  box-shadow: 0 0 10px rgba(192, 57, 43, 0.6);
+}
+
+.hazard-catastrophic .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #8e44ad, #ff5e5e);
+  box-shadow: 0 0 15px rgba(142, 68, 173, 0.7);
+  animation: pulse 1.5s infinite;
+}
+
+.hazard-continental .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #ff5e5e, #ff3838);
+  box-shadow: 0 0 20px rgba(255, 94, 94, 0.8);
+  animation: pulse 1.2s infinite;
+}
+
+.hazard-global .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #ff3838, #b92121);
+  box-shadow: 0 0 25px rgba(255, 56, 56, 0.9);
+  animation: pulse 1s infinite;
+}
+
+.hazard-extinction .hazard-indicator-bar { 
+  background: linear-gradient(90deg, #b92121, #4a0000);
+  box-shadow: 0 0 30px rgba(185, 33, 33, 1);
+  animation: pulse 0.8s infinite;
 }
 
 .energy-title {
@@ -426,25 +489,57 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   color: #ff7f50;
 }
 
-.energy-comparison {
-  background: rgba(255, 69, 0, 0.2);
-  border-radius: 6px;
-  padding: 10px;
-  margin-top: 5px;
+.energy-comparisons {
+  margin-top: 15px;
 }
 
-.comparison-label {
-  display: block;
+.comparisons-title {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 4px;
+}
+
+.comparisons-list {
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style-type: disc;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.comparison-item {
   font-size: 13px;
-  margin-bottom: 4px;
-  opacity: 0.9;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.comparison-value {
-  display: block;
+.energy-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.detail-value {
   font-size: 14px;
   font-weight: bold;
-  color: #ffa07a;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .energy-disclaimer {
