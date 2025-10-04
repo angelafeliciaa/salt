@@ -18,13 +18,6 @@ export function CameraNavigation({
     <div className="camera-navigation">
       <button 
         className="nav-button camera-button"
-        onClick={onNavigateToEarth}
-      >
-        Earth
-      </button>
-      
-      <button 
-        className="nav-button camera-button"
         onClick={onNavigateToAsteroid}
         disabled={!asteroidSelected}
       >

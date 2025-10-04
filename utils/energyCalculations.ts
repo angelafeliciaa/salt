@@ -335,25 +335,5 @@ export function getMultipleComparisons(megatons: number): string[] {
     }
   }
   
-  // Energy consumption comparison
-  const worldEnergyYear = 157000; // World annual energy consumption in Mt TNT equivalent
-  if (megatons > 100) {
-    const worldEnergyRatio = megatons / worldEnergyYear;
-    if (worldEnergyRatio < 1) {
-      comparisons.push(`${(worldEnergyRatio * 100).toFixed(1)}% of worldwide annual energy consumption`);
-    } else {
-      comparisons.push(`${worldEnergyRatio.toFixed(1)}× worldwide annual energy consumption`);
-    }
-  }
-  
-  // Earth's daily energy from the sun (173,000 terawatts = ~3.6 million MT daily)
-  const earthSolarEnergyDay = 3600000; // Daily solar energy in Mt TNT
-  if (megatons > 10000) {
-    const solarEnergyRatio = megatons / earthSolarEnergyDay;
-    if (solarEnergyRatio >= 0.01) {
-      comparisons.push(`${(solarEnergyRatio * 100).toFixed(2)}% of the solar energy Earth receives in a day`);
-    }
-  }
-  
   return comparisons;
 }

@@ -1,6 +1,7 @@
+/* Root reset */
 * { box-sizing: border-box; }
-html, body { height: 100%; }
-html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #050715, #03040d 55%, #01030a); color: #f2f6ff; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji; }
+html, body, #app { height: 100%; }
+html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b1020, #05060d 60%, #02030a); color: #e8ecff; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji; }
 
 #scene-container { position: fixed; inset: 0; }
 
@@ -117,6 +118,38 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   color: #2ecc71;
 }
 
+/* Camera navigation buttons */
+.camera-navigation {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.camera-button {
+  background-color: rgba(6, 10, 28, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.camera-button:hover:not(:disabled) {
+  background-color: rgba(30, 30, 30, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.camera-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 720px) {
 	#info-panel { left: 16px; right: 16px; width: auto; }
 	.controls input[type="range"] { width: 120px; }
@@ -130,19 +163,21 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
     max-height: 50vh;
   }
   
-  .asteroid-energy-panel {
-    top: auto;
-    bottom: 140px;
-    left: 10px;
-    width: calc(100% - 20px);
-    max-width: 400px;
-    height: auto;
-  }
-  
   .asteroid-navigation {
     bottom: 10px;
     width: calc(100% - 20px);
     justify-content: center;
+  }
+  
+  .camera-navigation {
+    top: 10px;
+    width: calc(100% - 40px);
+    justify-content: center;
+  }
+  
+  .camera-button {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 }
 
@@ -350,7 +385,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   position: fixed;
   top: 80px;
   left: 20px;
-  width: 340px;
+  width: 450px;
   max-width: calc(100% - 40px);
   background: rgba(20, 20, 30, 0.85);
   border-radius: 12px;
@@ -440,8 +475,8 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 .energy-stats {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 2px;
+  margin-bottom: 2px;
 }
 
 .energy-stat {
@@ -449,7 +484,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
   justify-content: space-between;
   align-items: center;
   background: rgba(20, 20, 30, 0.5);
-  padding: 8px 12px;
+  padding: 8px 4px;
   border-radius: 6px;
 }
 
@@ -459,7 +494,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 }
 
 .energy-stat-value {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
   color: white;
 }
@@ -576,7 +611,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #05
 .comparison-item {
   position: relative;
   padding-left: 16px;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   font-size: 13px;
   line-height: 1.4;
 }

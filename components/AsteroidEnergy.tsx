@@ -81,27 +81,6 @@ export function AsteroidEnergy({ asteroid }: AsteroidEnergyProps) {
         </ul>
       </div>
       
-      <div className="energy-details">
-        <div className="detail-item">
-          <span className="detail-label">Asteroid Mass</span>
-          <span className="detail-value">
-            {(calculateAsteroidMass(asteroid) / 1e9).toFixed(2)} kilotons
-          </span>
-        </div>
-        <div className="detail-item">
-          <span className="detail-label">Estimated Density</span>
-          <span className="detail-value">
-            {getAsteroidDensity(asteroid).toLocaleString()} kg/m³
-          </span>
-        </div>
-        <div className="detail-item">
-          <span className="detail-label">Impact Velocity</span>
-          <span className="detail-value">
-            {parseFloat(asteroid.closeApproachData[0].velocity.kmPerSecond).toFixed(2)} km/s
-          </span>
-        </div>
-      </div>
-      
       <div className="energy-disclaimer">
         <small>*Calculations based on estimated diameter, composition-based density, and velocity</small>
       </div>
