@@ -1,6 +1,6 @@
 // Properly extend JSX IntrinsicElements with React Three Fiber's elements
 import type { ThreeElements } from "@react-three/fiber";
-declare global {
+declare module "react" {
   namespace JSX {
     interface IntrinsicElements extends ThreeElements {
       // Explicit fallbacks for common elements used in this project
@@ -19,6 +19,7 @@ declare global {
       instancedMesh: any;
       points: any;
       sunShaderMaterial: any;
+      customShaderMaterial: any;
     }
   }
 }

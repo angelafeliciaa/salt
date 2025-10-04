@@ -43,7 +43,7 @@ export function CartesianScene({
       <Canvas camera={{ position: cameraPosition, fov: 50 }} style={{ background }}>
 
         {/* IBL lighting */}
-        <Environment preset="city" />
+        {/* <Environment preset="city" /> */}
 
         {/* Axes at origin using typed Line from drei */}
         {showAxes && (

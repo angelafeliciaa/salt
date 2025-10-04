@@ -4,7 +4,7 @@ import React, { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
-import EnhancedSun from "./EnhancedSun";
+import Sun from "./Sun";
 import EnhancedPlanet from "./EnhancedPlanet";
 import Stars from "./Stars";
 import Explosion from "./Explosion";
@@ -25,8 +25,8 @@ const innerPlanets: PlanetData[] = [
   {
     name: "Mercury",
     color: "#9ca3af", // Gray
-    size: 0.383, // ~38% of Earth's size
-    distance: 0.387, // 0.387 AU from Sun
+    size: 5.745, // ~38% of Earth's size
+    distance: 38.7, // 0.387 AU from Sun
     orbitalPeriod: 88, // 88 Earth days
     rotationPeriod: 1408, // ~59 Earth days
     axialTilt: 0.03,
@@ -34,8 +34,8 @@ const innerPlanets: PlanetData[] = [
   {
     name: "Venus",
     color: "#fbbf24", // Dark yellow
-    size: 0.95, // 95% of Earth's size
-    distance: 0.723, // 0.723 AU from Sun
+    size: 14.25, // 95% of Earth's size
+    distance: 72.3, // 0.723 AU from Sun
     orbitalPeriod: 225, // 225 Earth days
     rotationPeriod: -5832, // Retrograde rotation (~243 Earth days)
     axialTilt: 177.4, // Nearly upside down
@@ -43,8 +43,8 @@ const innerPlanets: PlanetData[] = [
   {
     name: "Earth",
     color: "#60a5fa", // Blue
-    size: 1, // Reference size
-    distance: 1, // Reference distance (1 AU)
+    size: 15, // Reference size
+    distance: 100, // Reference distance (1 AU)
     orbitalPeriod: 365.25, // Earth days
     rotationPeriod: 24, // Hours
     axialTilt: 23.5,
@@ -52,8 +52,8 @@ const innerPlanets: PlanetData[] = [
   {
     name: "Mars",
     color: "#dc2626", // Red
-    size: 0.532, // ~53% of Earth's size
-    distance: 1.524, // 1.524 AU from Sun
+    size: 7.98, // ~53% of Earth's size
+    distance: 152.4, // 1.524 AU from Sun
     orbitalPeriod: 687, // 687 Earth days
     rotationPeriod: 24.6, // Hours
     axialTilt: 25.2,
@@ -114,14 +114,25 @@ export function Planet({
   return (
     <>
       {/* Orbit path visualization */}
-      {/* @ts-expect-error r3f intrinsic */}
-      <mesh rotation-x={Math.PI / 2}>
-        {/* @ts-expect-error r3f intrinsic */}
-        <ringGeometry args={[orbitRadius - 0.01, orbitRadius + 0.01, 64]} />
-        {/* @ts-expect-error r3f intrinsic */}
-        <meshBasicMaterial color="#444444" opacity={0.3} transparent side={THREE.DoubleSide} />
-      {/* @ts-expect-error r3f intrinsic */}
-      </mesh>
+      {(() => {
+        const thickness = orbitRadius * 0.005;
+        const inner = Math.max(0.001, orbitRadius - thickness / 2);
+        const outer = orbitRadius + thickness / 2;
+        return (
+          <mesh rotation-x={Math.PI / 2}>
+            <ringGeometry args={[inner, outer, 128]} />
+            <meshBasicMaterial 
+              color="#ffffff" 
+              opacity={1} 
+              transparent 
+              side={THREE.DoubleSide}
+              depthWrite={false}
+              polygonOffset
+              polygonOffsetFactor={-1}
+            />
+          </mesh>
+        );
+      })()}
       
       {/* Planet with enhanced visuals */}
       <EnhancedPlanet 
@@ -138,15 +149,9 @@ export function Planet({
   );
 }
 
-export function Sun() {
-  // We'll use EnhancedSun instead of basic sun implementation
-  return (
-    <EnhancedSun 
-      radius={0.4} 
-      position={[0, 0, 0]} 
-      intensity={3}
-    />
-  );
+// Basic Sun component wrapper
+export function SunNode() {
+  return <Sun />;
 }
 
 export function SolarSystemControls({
@@ -239,7 +244,7 @@ export default function SolarSystem({
       <Stars count={800} radius={100} starSize={0.12} />
       
       {/* The Sun */}
-      <Sun />
+      <SunNode />
       
       {/* Inner Planets */}
       {innerPlanets.map((planet) => (
@@ -280,16 +285,13 @@ export default function SolarSystem({
       )}
       
       {/* Easter egg: Double-click anywhere to trigger an explosion */}
-      {/* @ts-ignore - r3f types */}
       <mesh 
         position={[0, 0, 0]} 
         scale={100} 
         visible={false} 
         onDoubleClick={triggerRandomExplosion}
       >
-        {/* @ts-ignore - r3f types */}
         <sphereGeometry args={[1, 8, 8]} />
-        {/* @ts-ignore - r3f types */}
         <meshBasicMaterial transparent opacity={0} />
       {/* @ts-ignore - r3f types */}
       </mesh>

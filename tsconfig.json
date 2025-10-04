@@ -23,7 +23,9 @@
       ]
     },
     "types": [
-      "node"
+      "node",
+      "@react-three/fiber",
+      "three"
     ],
     "incremental": true,
     "plugins": [
