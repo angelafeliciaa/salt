@@ -130,7 +130,6 @@ export function Marker({ position, color = "#e5e7eb", size = 0.12 }: { position:
  */
 export function Body({ position, children }: { position: Vec3; children?: ReactNode }) {
   return (
-    // @ts-expect-error r3f intrinsic
     <group position={position}>{children ?? <CenterSphere radius={0.2} />}</group>
   );
 }

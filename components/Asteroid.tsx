@@ -89,7 +89,6 @@ export function Asteroid({
   });
 
   return (
-    // @ts-expect-error r3f intrinsic
     <group 
       ref={asteroidRef}
       position={position}
@@ -98,27 +97,20 @@ export function Asteroid({
       onPointerOut={() => setHovered(false)}
     >
       {/* Hazardous glow effect */}
-      {/* @ts-expect-error r3f intrinsic */}
       <mesh ref={glowRef}>
-        {/* @ts-expect-error r3f intrinsic */}
         <sphereGeometry args={[size * 1.5, 16, 16]} />
-        {/* @ts-expect-error r3f intrinsic */}
         <meshBasicMaterial 
           color="#ff3300"
           transparent
           opacity={0.2}
           side={THREE.BackSide}
         />
-        {/* @ts-expect-error r3f intrinsic */}
       </mesh>
     
       {/* Asteroid body with irregular shape */}
-      {/* @ts-expect-error r3f intrinsic */}
       <mesh>
         {/* Use dodecahedron for irregular asteroid-like shape */}
-        {/* @ts-expect-error r3f intrinsic */}
-        <dodecahedronGeometry args={[size, 0]} />
-        {/* @ts-expect-error r3f intrinsic */}
+        <dodecahedronGeometry args={[size, 0]} /> 
         <meshStandardMaterial 
           color={color}
           roughness={0.7}
@@ -126,23 +118,18 @@ export function Asteroid({
           emissive={color}
           emissiveIntensity={selected ? 0.6 : hovered ? 0.4 : 0.2}
         />
-        {/* @ts-expect-error r3f intrinsic */}
       </mesh>
 
       {/* Selection indicator */}
       {selected && (
-        // @ts-expect-error r3f intrinsic
         <mesh>
-          {/* @ts-expect-error r3f intrinsic */}
           <ringGeometry args={[size * 1.8, size * 1.9, 32]} />
-          {/* @ts-expect-error r3f intrinsic */}
           <meshBasicMaterial 
             color="#ff5500"
             transparent
             opacity={0.6}
             side={THREE.DoubleSide}
           />
-          {/* @ts-expect-error r3f intrinsic */}
         </mesh>
       )}
       
@@ -161,7 +148,6 @@ export function Asteroid({
           </Text>
         </Billboard>
       )}
-      {/* @ts-expect-error r3f intrinsic */}
     </group>
   );
 }
