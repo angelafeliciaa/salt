@@ -224,8 +224,8 @@ export default function SolarSystem({
 
   return (
     <>
-      {/* Background stars */}
-      <Stars count={5000} radius={100} starSize={0.15} />
+      {/* Background stars - reduced count for less visual clutter */}
+      <Stars count={800} radius={100} starSize={0.12} />
       
       {/* The Sun */}
       <Sun />
