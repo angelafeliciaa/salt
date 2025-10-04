@@ -147,7 +147,6 @@ export function Explosion({
   });
   
   return (
-    // @ts-expect-error r3f intrinsic
     <points ref={pointsRef} position={position} geometry={geometry} material={material} />
   );
 }
