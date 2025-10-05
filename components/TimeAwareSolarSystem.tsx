@@ -220,8 +220,8 @@ export function TimeAwareSolarSystem({
 
   return (
     <>
-      {/* Background stars - reduced count for less visual clutter */}
-      <Stars count={800} radius={100} starSize={0.12} />
+      {/* Background stars - scaled far away from the solar system */}
+      <Stars count={2500} radius={1000} starSize={1.5} />
       
       {/* The Sun */}
       <Sun />
