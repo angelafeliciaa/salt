@@ -9,7 +9,6 @@ import * as THREE from "three";
 const PlanetAtmosphere = ({ radius, color = "#4299e199" }: { radius: number; color?: string }) => {
   return (
     <Sphere args={[radius * 1.05, 32, 16]} position={[0, 0, 0]}>
-      {/* @ts-expect-error r3f intrinsic */}
       <meshBasicMaterial 
         color={color} 
         transparent 
@@ -76,7 +75,6 @@ export function EnhancedPlanet({
   };
 
   return (
-    // @ts-expect-error r3f intrinsic
     <group 
       position={position}
       ref={planetRef}
@@ -89,7 +87,6 @@ export function EnhancedPlanet({
         receiveShadow
       >
         {texture ? (
-          // @ts-expect-error r3f intrinsic
           <meshStandardMaterial 
             map={texture} 
             metalness={0.1} 
@@ -98,7 +95,6 @@ export function EnhancedPlanet({
             emissiveIntensity={hovered ? 0.4 : 0}
           />
         ) : (
-          // @ts-expect-error r3f intrinsic
           <meshStandardMaterial 
             color={color} 
             metalness={0.1} 
@@ -127,7 +123,6 @@ export function EnhancedPlanet({
           </Text>
         </Billboard>
       )}
-      {/* @ts-expect-error r3f intrinsic */}
     </group>
   );
 }
