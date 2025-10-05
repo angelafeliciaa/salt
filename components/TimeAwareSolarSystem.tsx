@@ -253,24 +253,25 @@ export function TimeAwareSolarSystem({
         );
       })}
       
-      {/* Render only the selected asteroid */}
-      {(() => {
-        const selectedIndex = asteroids.findIndex(a => a.id === selectedAsteroidId);
-        if (selectedIndex >= 0) {
-          const selectedAsteroid = asteroids[selectedIndex];
+      {/* Render all asteroids */}
+      {asteroids.map((asteroid, index) => {
+        const isSelected = asteroid.id === selectedAsteroidId;
+        
+        // Only render if we have position data
+        if (asteroidPositions[index]) {
           return (
             <AsteroidModel
-              key={selectedAsteroid.id}
-              asteroid={selectedAsteroid}
-              position={asteroidPositions[selectedIndex] || [0, 0, 0]}
-              selected={true}
-              onClick={() => onAsteroidClick(selectedAsteroid)}
+              key={asteroid.id}
+              asteroid={asteroid}
+              position={asteroidPositions[index] || [0, 0, 0]}
+              selected={isSelected}
+              onClick={() => onAsteroidClick(asteroid)}
               modelPath="/shaders/asteroidPack.glb"
             />
           );
         }
         return null;
-      })()}
+      })}
       
       {/* Explosion effects */}
       {showExplosion && (

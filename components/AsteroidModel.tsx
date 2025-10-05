@@ -35,7 +35,8 @@ export const AsteroidModel = forwardRef(({
   const modelRef = useRef<THREE.Group | null>(null);
   
   // Calculate size based on asteroid diameter, but keep it visible
-  const size = Math.max(0.1, asteroid.diameter.avg * 0.1);
+  // Increased scaling factor from 0.1 to 0.25 to match Asteroid.tsx
+  const size = Math.max(0.15, asteroid.diameter.avg * 0.25);
   
   // Handle model setup after loading
   useEffect(() => {

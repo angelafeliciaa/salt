@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Get parameters
     const { searchParams } = new URL(request.url);
     // Define the path to the CSV file
-    const csvFilePath = path.join(process.cwd(), 'app', 'api', 'neo', 'sbdb_query_results.csv');
+    const csvFilePath = path.join(process.cwd(), 'app', 'api', 'neo', 'selected_asteroids.csv');
     
     // Read the CSV file
     const fileContent = fs.readFileSync(csvFilePath, 'utf-8');

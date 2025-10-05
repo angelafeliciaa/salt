@@ -14,6 +14,12 @@ export function useAsteroidManager() {
   const [totalAsteroidCount, setTotalAsteroidCount] = useState<number>(0);
   const [hazardousAsteroidCount, setHazardousAsteroidCount] = useState<number>(0);
   
+  // Search state
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  
   // Fetch asteroid data from our API
   const fetchAsteroids = useCallback(async () => {
     try {
@@ -113,6 +119,63 @@ export function useAsteroidManager() {
     });
   }, [asteroids]); // Only recalculate when asteroids array changes
   
+  // Search for asteroids by name
+  const searchAsteroids = useCallback(async (name: string) => {
+    try {
+      setIsSearching(true);
+      setSearchError(null);
+      setSearchQuery(name);
+      
+      // Make API call with name parameter
+      const response = await fetch(`/api/neo?name=${encodeURIComponent(name)}&hazardous_only=true`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search asteroids');
+      }
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Process search results
+      if (data.asteroids && Array.isArray(data.asteroids)) {
+        if (data.asteroids.length > 0) {
+          setAsteroids(data.asteroids);
+          setSelectedAsteroid(data.asteroids[0]);
+          setCurrentIndex(0);
+          setIsSearchMode(true);
+        } else {
+          throw new Error(`No asteroids found matching "${name}"`);
+        }
+      } else {
+        throw new Error('Invalid response format from search');
+      }
+      
+    } catch (err) {
+      console.error('Error searching asteroids:', err);
+      setSearchError(err instanceof Error ? err.message : 'Failed to search asteroids');
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+  
+  // Clear search and return to default asteroid list
+  const clearSearch = useCallback(() => {
+    setIsSearchMode(false);
+    setSearchQuery(null);
+    setSearchError(null);
+    
+    // If we already have the original list, just restore it
+    if (asteroids.length > 0 && !isSearchMode) {
+      return;
+    }
+    
+    // Otherwise, fetch the original list again
+    fetchAsteroids();
+  }, [fetchAsteroids, asteroids.length, isSearchMode]);
+  
   return {
     asteroids,
     loading,
@@ -126,7 +189,14 @@ export function useAsteroidManager() {
     refreshAsteroids,
     totalAsteroids: hazardousAsteroidCount,
     totalAsteroidsInDatabase: totalAsteroidCount,
-    hazardousAsteroidCount
+    hazardousAsteroidCount,
+    // Search related
+    searchAsteroids,
+    clearSearch,
+    isSearching,
+    searchError,
+    searchQuery,
+    isSearchMode
   };
 }
 

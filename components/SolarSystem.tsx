@@ -313,25 +313,23 @@ export default function SolarSystem({
         );
       })}
       
-      {/* Render only the selected asteroid */}
-      {(() => {
-        const selectedIndex = asteroids.findIndex(a => a.id === selectedAsteroidId);
-        if (selectedIndex >= 0) {
-          const selectedAsteroid = asteroids[selectedIndex];
-          return (
-            <AsteroidModel
-              key={selectedAsteroid.id}
-              asteroid={selectedAsteroid}
-              position={asteroidPositions[selectedIndex] || [0, 0, 0]}
-              selected={true}
-              onClick={() => onAsteroidClick(selectedAsteroid)}
-              ref={asteroidRef}
-              modelPath="/shaders/asteroidPack.glb"
-            />
-          );
-        }
-        return null;
-      })()}
+      {/* Render all asteroids */}
+      {asteroids.map((asteroid, index) => {
+        const isSelected = asteroid.id === selectedAsteroidId;
+        const ref = isSelected ? asteroidRef : null;
+        
+        return (
+          <AsteroidModel
+            key={asteroid.id}
+            asteroid={asteroid}
+            position={asteroidPositions[index] || [0, 0, 0]}
+            selected={isSelected}
+            onClick={() => onAsteroidClick(asteroid)}
+            ref={isSelected ? ref : undefined}
+            modelPath="/shaders/asteroidPack.glb"
+          />
+        );
+      })}
       
       {/* Explosion effects */}
       {showExplosion && (
