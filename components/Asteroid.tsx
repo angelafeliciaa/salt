@@ -125,7 +125,7 @@ export const Asteroid = forwardRef(({
       {/* Asteroid body with irregular shape */}
       <mesh>
         {/* Use dodecahedron for irregular asteroid-like shape */}
-        <dodecahedronGeometry args={[size, 0]} /> 
+        <dodecahedronGeometry args={[size, 0]} />
         <meshStandardMaterial 
           color={color}
           roughness={0.7}
