@@ -12,6 +12,15 @@ import { AsteroidData } from "./Asteroid";
 import AsteroidModel from "./AsteroidModel";
 import { BODIES, helioXYZAt } from '../utils/ephemeris';
 import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
+// Planet texture maps (diffuse/color)
+import mercuryMap from "../app/images/mercurymap.jpg";
+import venusMap from "../app/images/venusmap.jpg";
+import earthDayMap from "../app/images/earth_daymap.jpg";
+import marsMap from "../app/images/marsmap.jpg";
+// Bump/height maps
+import mercuryBump from "../app/images/mercurybump.jpg";
+import venusBump from "../app/images/venusbump.jpg";
+import marsBump from "../app/images/marsbump.jpg";
 
 interface PlanetData {
   name: string;
@@ -203,6 +212,20 @@ export function TimeAwareSolarSystem({
             rotationSpeed={0.005}
             hasAtmosphere={hasAtmosphere}
             atmosphereColor={atmosphereColor}
+            textureUrl={
+              planet.name === "Mercury" ? mercuryMap :
+              planet.name === "Venus" ? venusMap :
+              planet.name === "Earth" ? earthDayMap :
+              planet.name === "Mars" ? marsMap :
+              undefined
+            }
+            bumpTextureUrl={
+              planet.name === "Mercury" ? mercuryBump :
+              planet.name === "Venus" ? venusBump :
+              planet.name === "Mars" ? marsBump :
+              undefined
+            }
+            bumpScale={planet.name === "Mars" ? 0.05 : 0.03}
             showLabel={showLabels || hovered}
           />
         </group>

@@ -251,7 +251,7 @@ const Sun = () => {
             </Billboard>
 
             {/* Light sources */}
-            <pointLight position={[0, 0, 0]} intensity={80000} color={'rgb(255, 220, 100)'} />
+            <pointLight position={[0, 0, 0]} intensity={180000} color={'rgb(255, 220, 100)'} />
             
             {/* Additional light to enhance the glow effect */}
             <pointLight position={[0, 0, 0]} intensity={20000} color={'rgb(255, 150, 50)'} distance={100} />
