@@ -53,7 +53,7 @@ const planets: PlanetData[] = [
   {
     name: "Mars",
     color: "#dc2626",
-    size: 7.95, // ~53% of Earth's size (matching SolarSystem.tsx)
+    size: 7.98, // ~53% of Earth's size (matching SolarSystem.tsx)
     distance: 152.4, // 1.524 AU from Sun (matching SolarSystem.tsx)
     orbitalPeriod: 687,
     rotationPeriod: 24.6,
@@ -180,7 +180,7 @@ export function TimeAwareSolarSystem({
       >
         {/* Orbit path visualization - positioned at origin */}
         {(() => {
-          const thickness = orbitRadius * 0.005;
+          const thickness = orbitRadius * 0.0005;
           const inner = Math.max(0.001, orbitRadius - thickness / 2);
           const outer = orbitRadius + thickness / 2;
           return (
