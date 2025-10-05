@@ -1,176 +1,53 @@
-"use client";
-
-import { useState, useRef } from "react";
-import CartesianScene from "../components/CartesianScene";
-import SolarSystem, { SolarSystemControls } from "../components/SolarSystem";
-import TimeAwareSolarSystem from "../components/TimeAwareSolarSystem";
-import TimeScrubber from "../components/TimeScrubber";
-import useAsteroidManager from "../components/useAsteroidManager";
-import AsteroidInfo from "../components/AsteroidInfo";
-import AsteroidEnergy from "../components/AsteroidEnergy";
-import AsteroidNavigation from "../components/AsteroidNavigation";
-import Solutions from "components/Solutions";
-import CameraNavigation from "../components/CameraNavigation";
+import Link from "next/link";
 
 export default function HomePage() {
-  const [animationSpeed, setAnimationSpeed] = useState(0.5);
-  const [showLabels, setShowLabels] = useState(true);
-  const [navigationTarget, setNavigationTarget] = useState<"none" | "earth" | "asteroid">("none");
-  const [useTimeAware, setUseTimeAware] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isPaused, setIsPaused] = useState(true);
-  
-  // Use the asteroid manager hook to handle asteroid data and logic
-  const {
-    asteroids,
-    loading,
-    error,
-    currentIndex,
-    selectedAsteroid,
-    asteroidPositions,
-    previousAsteroid,
-    nextAsteroid,
-    handleAsteroidClick,
-    totalAsteroids,
-    totalAsteroidsInDatabase,
-    hazardousAsteroidCount,
-    refreshAsteroids
-  } = useAsteroidManager();
-  
   return (
-    <main style={{ width: "100vw", height: "100vh", position: "relative" }}>      
-      {/* Loading indicator */}
-      {loading && (
-        <div className="loading-indicator">
-          Loading asteroid data...
+    <main style={{ width: "100vw", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={{ fontWeight: 800, fontSize: 22 }}>Salt</span>
+          <span style={{ opacity: 0.7, fontSize: 12, letterSpacing: 0.4 }}>Exploration</span>
         </div>
-      )}
-      
-      {/* Error message */}
-      {error && (
-        <div className="error-message">
-          Error: {error}
+        <nav style={{ display: "flex", gap: 12 }}>
+          <Link href="/sandbox" style={{ textDecoration: "none" }}>
+            <button className="ghost">Open Sandbox</button>
+          </Link>
+        </nav>
+      </header>
+      <section style={{ flex: 1, display: "grid", alignItems: "center", padding: "0 28px 28px", gap: 56 }}>
+        <div style={{ maxWidth: 980, margin: "0 auto", textAlign: "center", padding: "160px 0 100px" }}>
+          <h1 style={{ margin: 0, fontSize: 112, lineHeight: 1.02 }}>Salt</h1>
+          <p style={{ marginTop: 18, opacity: 0.9, fontSize: 20 }}>
+            Interactive space sandbox showcasing asteroid data, orbits, and impact heuristics. Explore the live model below or open the full experience.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 18 }}>
+            <Link href="/sandbox" style={{ textDecoration: "none" }}>
+              <button className="ghost" style={{ padding: "12px 18px", fontSize: 16 }}>Start Sandbox</button>
+            </Link>
+          </div>
         </div>
-      )}
-      
-      {/* 3D Scene */}
-      <CartesianScene 
-        gridSize={300} 
-        gridDivisions={30} 
-        cameraPosition={[180, 120, 180]}
-        background="#030303" // Explicitly set darker background
-        // No center sphere since the Sun will be at the origin
-        originNode={null}
-      >
-        {useTimeAware ? (
-          <TimeAwareSolarSystem 
-            animationSpeed={animationSpeed}
-            showLabels={showLabels}
-            asteroids={asteroids}
-            asteroidPositions={asteroidPositions}
-            selectedAsteroidId={selectedAsteroid?.id}
-            onAsteroidClick={handleAsteroidClick}
-            currentTime={currentTime}
-            isPaused={isPaused}
-            onTimeChange={setCurrentTime}
-          />
-        ) : (
-          <SolarSystem 
-            animationSpeed={animationSpeed}
-            showLabels={showLabels}
-            asteroids={asteroids}
-            asteroidPositions={asteroidPositions}
-            selectedAsteroidId={selectedAsteroid?.id}
-            onAsteroidClick={handleAsteroidClick}
-            navigationTarget={navigationTarget}
-            onNavigationComplete={() => setNavigationTarget("none")}
-          />
-        )}
-      </CartesianScene>
-    
-      {/* Time Scrubber - only show when time-aware mode is enabled */}
-      {useTimeAware && (
-        <div style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 1000,
-          width: '600px',
-          maxWidth: '90vw'
-        }}>
-          <TimeScrubber
-            currentTime={currentTime}
-            onTimeChange={setCurrentTime}
-            isPaused={isPaused}
-            onPauseToggle={() => setIsPaused(!isPaused)}
-          />
-        </div>
-      )}
-
-      
-      
-      {/* Asteroid Energy Panel (visible when asteroid is selected) */}
-      {selectedAsteroid && !loading && (
-        <AsteroidEnergy asteroid={selectedAsteroid} />
-      )}
-      
-      {/* Asteroid Info Panel (visible when asteroid is selected) */}
-      {selectedAsteroid && !loading && (
-        <AsteroidInfo asteroid={selectedAsteroid} />
-      )}
-      
-      {/* Solutions Panel (visible when asteroid is selected) */}
-      {selectedAsteroid && !loading && (
-        <Solutions asteroid={selectedAsteroid} />
-      )}
-
-      {/* Navigation buttons (visible when there are asteroids) */}
-      {asteroids.length > 0 && !loading && (
-        <AsteroidNavigation
-          currentIndex={currentIndex}
-          totalAsteroids={asteroids.length}
-          totalAsteroidsInDatabase={totalAsteroidsInDatabase}
-          onPrevious={previousAsteroid}
-          onNext={nextAsteroid}
-        />
-      )}
-
-      {/* Mode Toggle */}
-      <div style={{
-        position: 'absolute',
-        top: '52%',
-        right: '0px',
-        zIndex: 1000
-      }}>
-        <div style={{
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          padding: '12px',
-          borderRadius: '8px',
-          color: 'white',
-          minWidth: '200px'
-        }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-            <input
-              type="checkbox"
-              checked={useTimeAware}
-              onChange={(e) => setUseTimeAware(e.target.checked)}
-              style={{ margin: 0, transform: 'scale(1.2)' }}
+        <div style={{ maxWidth: 1100, width: "100%", margin: "20px auto 0", position: "relative" }}>
+          <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <iframe
+              src="/sandbox"
+              title="Sandbox Preview"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, pointerEvents: "none", filter: "saturate(0.95) brightness(0.92)" }}
             />
-            <span style={{ fontWeight: '600' }}>Time-Aware Mode</span>
-          </label>
+            {/* Full overlay link to open sandbox when clicking anywhere */}
+            <Link href="/sandbox" aria-label="Open Sandbox" style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+              <span style={{ display: "none" }}>Open Sandbox</span>
+            </Link>
+            <div style={{ position: "absolute", right: 12, bottom: 12, display: "flex", gap: 8, zIndex: 2 }}>
+              <Link href="/sandbox" style={{ textDecoration: "none" }}>
+                <button className="ghost" style={{ backdropFilter: "blur(6px)" }}>Open Live</button>
+              </Link>
+            </div>
+          </div>
+          <p style={{ marginTop: 10, opacity: 0.65, fontSize: 12, textAlign: "center" }}>
+            Preview is non-interactive. Click anywhere to open the live sandbox.
+          </p>
         </div>
-      </div>
-      
-      {/* Camera Navigation buttons */}
-      <div>
-      <CameraNavigation
-        onNavigateToEarth={() => setNavigationTarget("earth")}
-        onNavigateToAsteroid={() => setNavigationTarget("asteroid")}
-        asteroidSelected={!!selectedAsteroid}
-      />
-      </div>
-      
+      </section>
     </main>
   );
 }
