@@ -5,7 +5,7 @@ export default function HomePage() {
     <main style={{ width: "100vw", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 28px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span style={{ fontWeight: 800, fontSize: 22 }}>Salt</span>
+          <span style={{ fontWeight: 600, fontSize: 22 }}>Salt</span>
           <span style={{ opacity: 0.7, fontSize: 12, letterSpacing: 0.4 }}>Exploration</span>
         </div>
         <nav style={{ display: "flex", gap: 12 }}>
@@ -16,7 +16,7 @@ export default function HomePage() {
       </header>
       <section style={{ flex: 1, display: "grid", alignItems: "center", padding: "0 28px 28px", gap: 56 }}>
         <div style={{ maxWidth: 980, margin: "0 auto", textAlign: "center", padding: "160px 0 100px" }}>
-          <h1 style={{ margin: 0, fontSize: 112, lineHeight: 1.02 }}>Salt</h1>
+          <h1 style={{ margin: 0, fontSize: 112, lineHeight: 1.02, fontWeight: 600 }}>Salt</h1>
           <p style={{ marginTop: 18, opacity: 0.9, fontSize: 20 }}>
             Interactive space sandbox showcasing asteroid data, orbits, and impact heuristics. Explore the live model below or open the full experience.
           </p>
