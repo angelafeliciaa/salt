@@ -21,10 +21,11 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
   // Deterministic category from diameter (km)
   // small < 0.05; medium 0.05–0.3; large 0.3–1.0; extra_large ≥ 1.0
   const getVideoCategory = (d: number) => {
-    if (d < 0.05) return "small";
-    if (d < 0.50) return "medium";
-    if (d < 6.0) return "large";
-    return "extra_large";
+    if (d < 0.50) return "small";
+    if (d < 1.0) return "medium";
+    if (d < 4.0) return "large";
+    if (d < 7.0) return "extra_large";
+    return "disaster"; // very large
   };
   const category = getVideoCategory(asteroid.diameter.avg);
   const videoSrc = `/videos/${category}.mp4`;

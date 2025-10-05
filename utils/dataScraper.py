@@ -91,21 +91,22 @@ def read_asteroid_data(file_path):
     
     return asteroids
 
-def categorize_by_size(asteroids):
+def randomize_asteroids(asteroids):
     """
-    Categorize asteroids by size
+    Randomize asteroids into groups instead of categorizing by size
     """
-    # Sort asteroids by diameter
-    sorted_asteroids = sorted(asteroids, key=lambda x: x['diameter'])
+    # Randomize asteroids instead of sorting by diameter
+    randomized_asteroids = asteroids.copy()
+    random.shuffle(randomized_asteroids)
     
-    total = len(sorted_asteroids)
+    total = len(randomized_asteroids)
     
-    # Determine size categories
-    very_small = sorted_asteroids[:int(total * 0.2)]  # Bottom 20%
-    small = sorted_asteroids[int(total * 0.2):int(total * 0.4)]  # 20-40%
-    medium = sorted_asteroids[int(total * 0.4):int(total * 0.6)]  # 40-60%
-    large = sorted_asteroids[int(total * 0.6):int(total * 0.8)]  # 60-80%
-    extra_large = sorted_asteroids[int(total * 0.8):]  # Top 20%
+    # Determine randomized categories (no longer based on actual size)
+    very_small = randomized_asteroids[:int(total * 0.2)]  # Random 20%
+    small = randomized_asteroids[int(total * 0.2):int(total * 0.4)]  # Random 20-40%
+    medium = randomized_asteroids[int(total * 0.4):int(total * 0.6)]  # Random 40-60%
+    large = randomized_asteroids[int(total * 0.6):int(total * 0.8)]  # Random 60-80%
+    extra_large = randomized_asteroids[int(total * 0.8):]  # Random top 20%
     
     return {
         'very_small': very_small,
@@ -117,8 +118,8 @@ def categorize_by_size(asteroids):
 
 def select_samples(categorized_asteroids, samples_per_category=200):
     """
-    Select a balanced sample of asteroids from each category
-    Default is now 200 per category for a total of 1000 asteroids
+    Select a random sample of asteroids from each randomized group
+    Default is now 200 per group for a total of 1000 asteroids
     """
     selected = []
     
@@ -150,32 +151,32 @@ def write_to_csv(asteroids, output_file):
             writer.writerow(asteroid)
 
 def main():
-    input_file = "e:\\Github\\nasa\\utils\\sbdb_query_results.csv"
-    output_file = "e:\\Github\\nasa\\utils\\selected_asteroids.csv"
-    api_output_file = "e:\\Github\\nasa\\app\\api\\neo\\selected_asteroids.csv"
+    input_file = "sbdb_query_results.csv"
+    output_file = "selected_asteroids.csv"
+    api_output_file = "..\\app\\api\\neo\\selected_asteroids.csv"
     
     print("Reading asteroid data...")
     asteroids = read_asteroid_data(input_file)
     print(f"Found {len(asteroids)} asteroids with valid diameter and orbital data")
     
-    print("Categorizing asteroids by size...")
-    categorized = categorize_by_size(asteroids)
+    print("Randomizing asteroids...")
+    categorized = randomize_asteroids(asteroids)
     
-    # Print statistics for each category
+    # Print statistics for each randomized group
     for category, category_asteroids in categorized.items():
         if category_asteroids:
             min_diameter = min(a['diameter'] for a in category_asteroids)
             max_diameter = max(a['diameter'] for a in category_asteroids)
-            # Calculate average kinetic energy for this category
+            # Calculate average kinetic energy for this group
             total_energy = sum(a['energy'] for a in category_asteroids)
             avg_energy = total_energy / len(category_asteroids)
             # Format energy in scientific notation for readability
             avg_energy_sci = f"{avg_energy:.2e}"
-            print(f"{category}: {len(category_asteroids)} asteroids, diameter range: {min_diameter:.2f} - {max_diameter:.2f} km")
+            print(f"{category} (randomized): {len(category_asteroids)} asteroids, diameter range: {min_diameter:.2f} - {max_diameter:.2f} km")
             print(f"   Average kinetic energy: {avg_energy_sci} joules")
     
-    print("Selecting balanced sample...")
-    samples_per_category = 200  # To get approximately 1000 asteroids (200 from each of 5 categories)
+    print("Selecting random sample...")
+    samples_per_category = 200  # To get approximately 1000 asteroids (200 from each of 5 randomized groups)
     selected_asteroids = select_samples(categorized, samples_per_category)
     
     print("Statistics for selected sample:")
@@ -188,13 +189,13 @@ def main():
                 selected_by_category[category].append(asteroid)
                 break
     
-    # Print energy statistics for selected asteroids by category
+    # Print energy statistics for selected asteroids by randomized group
     for category, asteroids in selected_by_category.items():
         if asteroids:
             total_energy = sum(a['energy'] for a in asteroids)
             avg_energy = total_energy / len(asteroids)
             avg_energy_sci = f"{avg_energy:.2e}"
-            print(f"Selected {category}: {len(asteroids)} asteroids, avg energy: {avg_energy_sci} joules")
+            print(f"Selected {category} (random): {len(asteroids)} asteroids, avg energy: {avg_energy_sci} joules")
     
     print("Writing selected asteroids to CSV...")
     write_to_csv(selected_asteroids, output_file)
