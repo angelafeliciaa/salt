@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
@@ -10,6 +10,7 @@ import Stars from "./Stars";
 import Explosion from "./Explosion";
 import Asteroid, { AsteroidData } from "./Asteroid";
 import { BODIES, helioXYZAt } from '../utils/ephemeris';
+import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
 
 interface PlanetData {
   name: string;
@@ -155,6 +156,22 @@ export function TimeAwareSolarSystem({
   const Planet = ({ planet, position }: { planet: PlanetData; position: [number, number, number] }) => {
     const planetRef = useRef<THREE.Group>(null);
     const [hovered, setHovered] = useState(false);
+    const { addTrailPoint } = useOrbitTrails();
+    
+    // Generate a unique ID for this planet
+    const planetId = useRef(`planet-${planet.name}-${Math.random().toString(36).substr(2, 9)}`);
+    
+    // Add trail point when position changes
+    const prevPosition = useRef<THREE.Vector3>(new THREE.Vector3(...position));
+    
+    useEffect(() => {
+      // Only add point when position changes significantly
+      const newPos = new THREE.Vector3(...position);
+      if (newPos.distanceToSquared(prevPosition.current) > 0.01) {
+        addTrailPoint(planetId.current, newPos);
+        prevPosition.current.copy(newPos);
+      }
+    }, [position, addTrailPoint]);
 
     // Planet rotation animation - only when not paused
     useFrame(() => {
@@ -168,39 +185,13 @@ export function TimeAwareSolarSystem({
     const atmosphereColor = planet.name === "Earth" ? "#4299e1" : 
                            planet.name === "Venus" ? "#fbbf2480" : 
                            undefined;
-
-    // Calculate orbit radius for ring visualization - matching SolarSystem.tsx
-    const orbitRadius = planet.distance * EARTH_DISTANCE;
-
+                           
     return (
       <group
         ref={planetRef}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        {/* Orbit path visualization - positioned at origin */}
-        {(() => {
-          const thickness = orbitRadius * 0.0005;
-          const inner = Math.max(0.001, orbitRadius - thickness / 2);
-          const outer = orbitRadius + thickness / 2;
-          return (
-            <mesh rotation-x={Math.PI / 2}>
-              <ringGeometry args={[inner, outer, 128]} />
-              <meshBasicMaterial 
-                color="#ffffff" 
-                opacity={1} 
-                transparent 
-                side={THREE.DoubleSide}
-                depthWrite={false}
-                polygonOffset
-                polygonOffsetFactor={-1}
-              />
-            </mesh>
-
-            
-          );
-        })()}
-        
         {/* Planet positioned on the orbit */}
         <group position={position}>
           <EnhancedPlanet
@@ -219,7 +210,7 @@ export function TimeAwareSolarSystem({
   };
 
   return (
-    <>
+    <OrbitTrailsProvider maxPoints={300} trailColor="#ffffff" trailOpacity={0.15}>
       {/* Background stars - scaled far away from the solar system */}
       <Stars count={2500} radius={1000} starSize={1.5} />
       
@@ -276,7 +267,7 @@ export function TimeAwareSolarSystem({
         <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
-    </>
+    </OrbitTrailsProvider>
   );
 }
 

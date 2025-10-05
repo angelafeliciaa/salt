@@ -16,7 +16,7 @@ export default function HomePage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
   const [showLabels, setShowLabels] = useState(true);
   const [navigationTarget, setNavigationTarget] = useState<"none" | "earth" | "asteroid">("none");
-  const [useTimeAware, setUseTimeAware] = useState(true);
+  const [useTimeAware, setUseTimeAware] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isPaused, setIsPaused] = useState(true);
   
@@ -58,6 +58,7 @@ export default function HomePage() {
         gridSize={300} 
         gridDivisions={30} 
         cameraPosition={[180, 120, 180]}
+        background="#030303" // Explicitly set darker background
         // No center sphere since the Sun will be at the origin
         originNode={null}
       >

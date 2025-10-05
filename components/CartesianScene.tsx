@@ -33,7 +33,7 @@ export function CartesianScene({
   gridDivisions = 30,
   showAxes = false,
   showGrids = false,
-  background = "#0a0a0a",
+  background = "#030303", // Much darker background for deep space
   cameraPosition = [200, 150, 200],
   originNode,
   children,

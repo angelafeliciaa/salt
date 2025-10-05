@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import React, { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sphere, Text, Billboard } from "@react-three/drei";
 import * as THREE from "three";
@@ -10,6 +10,7 @@ import Stars from "./Stars";
 import Explosion from "./Explosion";
 import Asteroid, { AsteroidData } from "./Asteroid";
 import CameraController from "./CameraController";
+import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
 
 interface PlanetData {
   name: string;
@@ -99,6 +100,12 @@ export const Planet = React.forwardRef(({
                          planet.name === "Venus" ? "#fbbf2480" : 
                          undefined;
                          
+  // Get trail functions
+  const { addTrailPoint } = useOrbitTrails();
+  
+  // Generate a unique ID for this planet
+  const planetId = React.useRef(`planet-${planet.name}-${Math.random().toString(36).substr(2, 9)}`);
+  
   // Orbital animation
   useFrame(({ clock }) => {
     // Calculate orbital position
@@ -109,31 +116,15 @@ export const Planet = React.forwardRef(({
     const x = Math.cos(angle) * orbitRadius;
     const z = Math.sin(angle) * orbitRadius;
     
-    setPosition([x, 0, z]);
+    const newPosition: [number, number, number] = [x, 0, z];
+    setPosition(newPosition);
+    
+    // Add point to the trail
+    addTrailPoint(planetId.current, new THREE.Vector3(x, 0, z));
   });
 
   return (
     <>
-      {/* Orbit path visualization */}
-      {(() => {
-        const thickness = orbitRadius * 0.0005;
-        const inner = Math.max(0.001, orbitRadius - thickness / 2);
-        const outer = orbitRadius + thickness / 2;
-        return (
-          <mesh rotation-x={Math.PI / 2}>
-            <ringGeometry args={[inner, outer, 128]} />
-            <meshBasicMaterial 
-              color="#ffffff" 
-              opacity={1} 
-              transparent 
-              side={THREE.DoubleSide}
-              depthWrite={false}
-              polygonOffset
-              polygonOffsetFactor={-1}
-            />
-          </mesh>
-        );
-      })()}
       
       {/* Planet with enhanced visuals */}
       <group ref={ref}>
@@ -252,7 +243,8 @@ export default function SolarSystem({
   };
 
   return (
-    <>
+    <OrbitTrailsProvider maxPoints={300} trailColor="#ffffff" trailOpacity={0.15}>
+      <>
       {/* Background stars - scaled far away from the solar system */}
       <Stars count={2500} radius={1000} starSize={1.5} />
       
@@ -333,6 +325,7 @@ export default function SolarSystem({
         navigationTarget={navigationTarget}
         onNavigationComplete={onNavigationComplete}
       />
-    </>
+      </>
+    </OrbitTrailsProvider>
   );
 }

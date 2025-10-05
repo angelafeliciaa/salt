@@ -15,8 +15,8 @@ interface StarsProps {
 export function Stars({
   count = 3000,
   radius = 1000, // Increased radius to be much farther away from the solar system
-  starSize = 1.2, // Balanced star size for visibility while remaining realistic
-  starColor = "#ffffff",
+  starSize = 0.8, // Reduced star size to make them more subtle
+  starColor = "#dddddd", // Slightly less bright white
   rotationSpeed = 0.0 //0.00005 // Reduced rotation speed for stars at greater distance
 }: StarsProps) {
   const starsRef = useRef<THREE.InstancedMesh>(null);
@@ -76,8 +76,8 @@ export function Stars({
       
       // Generate a random brightness factor (some stars are brighter than others)
       // Using exponential distribution to create a few very bright stars
-      // With a balanced brightness range to ensure visibility
-      const brightnessFactor = Math.pow(Math.random(), 2.5) * 1.5 + 0.5;
+      // With a reduced brightness range for a more subtle look
+      const brightnessFactor = Math.pow(Math.random(), 3.0) * 1.0 + 0.3;
       
       // Base scale inversely proportional to distance
       // Adjust the impact of distance on size
@@ -108,8 +108,8 @@ export function Stars({
       <meshBasicMaterial 
         color={starColor}
         transparent={true}
-        opacity={1.0}
-        toneMapped={false} // Prevent tone mapping to keep stars bright
+        opacity={0.7} // Reduced opacity for dimmer appearance
+        toneMapped={false} // Prevent tone mapping to keep stars visible
       />
     </instancedMesh>
   );
