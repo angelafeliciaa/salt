@@ -78,6 +78,14 @@ const EARTH_SIZE = 0.15; // Visual size in the scene
 const EARTH_DISTANCE = 2.5; // Distance from Sun in scene units
 const ANIMATION_SPEED = 0.5; // Higher values = faster orbits
 
+// Approximate orbital eccentricities for inner planets
+const ECCENTRICITY: Record<string, number> = {
+  Mercury: 0.2056,
+  Venus: 0.0067,
+  Earth: 0.0167,
+  Mars: 0.0934,
+};
+
 export const Planet = React.forwardRef(({
   planet,
   animationSpeed = ANIMATION_SPEED,
@@ -90,13 +98,13 @@ export const Planet = React.forwardRef(({
   // Calculate planet size relative to Earth
   const size = planet.size * EARTH_SIZE;
   
-  // Calculate orbit radius
-  const orbitRadius = planet.distance * EARTH_DISTANCE;
+  // Semi-major axis (scene units)
+  const semiMajorAxis = planet.distance * EARTH_DISTANCE;
   
-  // Planet position refs for orbital animation
-  const [position, setPosition] = React.useState<[number, number, number]>([orbitRadius, 0, 0]);
+  // Planet position refs for orbital animation (start at periapsis side of major axis)
+  const [position, setPosition] = React.useState<[number, number, number]>([semiMajorAxis, 0, 0]);
   
-  // Calculate orbital speed
+  // Calculate orbital speed (drives anomaly progression)
   const orbitalSpeed = (2 * Math.PI) / (planet.orbitalPeriod / 10) * animationSpeed;
   
   // Calculate rotation speed
@@ -116,15 +124,19 @@ export const Planet = React.forwardRef(({
   // Generate a unique ID for this planet
   const planetId = React.useRef(`planet-${planet.name}-${Math.random().toString(36).substr(2, 9)}`);
   
-  // Orbital animation
+  // Orbital animation (elliptical path with Sun at one focus)
   useFrame(({ clock }) => {
     // Calculate orbital position
     const time = clock.getElapsedTime() * animationSpeed;
     const angle = time * (2 * Math.PI) / (planet.orbitalPeriod / 10);
     
-    // Update position in orbit
-    const x = Math.cos(angle) * orbitRadius;
-    const z = Math.sin(angle) * orbitRadius;
+    // Simple Kepler-style ellipse: r = a(1 - e^2) / (1 + e cos ν)
+    const e = ECCENTRICITY[planet.name] ?? 0;
+    const a = semiMajorAxis;
+    const nu = angle; // treat as true anomaly for visual path
+    const r = (a * (1 - e * e)) / (1 + e * Math.cos(nu));
+    const x = Math.cos(nu) * r;
+    const z = Math.sin(nu) * r;
     
     const newPosition: [number, number, number] = [x, 0, z];
     setPosition(newPosition);

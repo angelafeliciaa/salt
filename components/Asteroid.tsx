@@ -78,18 +78,50 @@ export const Asteroid = forwardRef(({
 
   // Use ref for glow animation
   const glowRef = useRef<THREE.Mesh>(null);
+  const tempVec = useRef(new THREE.Vector3());
   
   // Animate the glow
-  useFrame(({ clock }) => {
-    if (glowRef.current) {
-      // Pulsating glow effect
-      const pulse = Math.sin(clock.getElapsedTime() * 2) * 0.2 + 0.8;
-      glowRef.current.scale.set(pulse, pulse, pulse);
-      
-      // Safely set opacity on the material
-      if (glowRef.current.material instanceof THREE.Material) {
-        (glowRef.current.material as THREE.Material & { opacity: number }).opacity = pulse * 0.3;
-      }
+  useFrame((state) => {
+    if (!glowRef.current || !asteroidRef.current) return;
+
+    // Compute camera distance to asteroid (world space)
+    const worldPos = tempVec.current;
+    asteroidRef.current.getWorldPosition(worldPos);
+    const cameraPos = state.camera.position;
+    const distance = worldPos.distanceTo(cameraPos);
+
+    // Desired on-screen size as a fraction of viewport height
+    // Larger when selected to make it easier to spot
+    const fractionOfView = selected ? 0.065 : 0.045;
+
+    // Convert desired screen fraction to world-space diameter at this distance
+    const fov = (state.camera as THREE.PerspectiveCamera).fov ?? 50;
+    const worldHeight = 2 * distance * Math.tan(THREE.MathUtils.degToRad(fov * 0.5));
+    const desiredWorldDiameter = worldHeight * fractionOfView;
+
+    // Our glow sphere base radius
+    const baseRadius = size * 1.5;
+
+    // Target uniform scale so that diameter ~= desiredWorldDiameter
+    const targetScale = desiredWorldDiameter / (2 * baseRadius);
+
+    // Gentle pulse
+    const t = state.clock.getElapsedTime();
+    const pulse = Math.sin(t * 2) * 0.12 + 0.88; // 0.76..1.0
+
+    // Clamp to avoid extreme sizes
+    const clamped = THREE.MathUtils.clamp(targetScale, 0.6, 120);
+    const finalScale = clamped * pulse;
+    glowRef.current.scale.set(finalScale, finalScale, finalScale);
+
+    // Opacity scales slightly with zoom-out, but remains subtle
+    const mat = glowRef.current.material as THREE.Material & { opacity?: number };
+    if ('opacity' in mat) {
+      const baseOpacity = selected ? 0.35 : 0.25;
+      const zoomBoost = THREE.MathUtils.clamp(targetScale * 0.015, 0, 0.25);
+      mat.opacity = THREE.MathUtils.clamp(baseOpacity + zoomBoost, 0.15, 0.5);
+      (mat as any).transparent = true;
+      (mat as any).depthWrite = false;
     }
   });
 

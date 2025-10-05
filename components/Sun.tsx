@@ -237,7 +237,7 @@ const Sun = () => {
             </mesh>
             
             {/* Name label */}
-            <Billboard position={[0, 15 * 1.3, 0]}>
+            <Billboard position={[0, 18 * 1.3, 0]}>
               <Text
                 fontSize={6 * 0.8}
                 color="#ffffff"
