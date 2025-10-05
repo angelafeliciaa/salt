@@ -178,11 +178,11 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
     max-height: 50vh;
   }
   
-  .asteroid-navigation {
+  /* .asteroid-navigation {
     bottom: 10px;
     width: calc(100% - 20px);
     justify-content: center;
-  }
+  } */
   
   .camera-navigation {
     top: 10px;
@@ -318,7 +318,7 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
 .asteroid-navigation {
   position: absolute;
   right: 20px;
-  top: 60%;
+  top: 80%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;

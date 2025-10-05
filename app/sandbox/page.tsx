@@ -11,6 +11,7 @@ import AsteroidEnergy from "../../components/AsteroidEnergy";
 import AsteroidNavigation from "../../components/AsteroidNavigation";
 import Solutions from "components/Solutions";
 import CameraNavigation from "../../components/CameraNavigation";
+import ChatBar from "../../components/ChatBar";
 
 export default function SandboxPage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
@@ -145,8 +146,7 @@ export default function SandboxPage() {
           asteroidSelected={!!selectedAsteroid}
         />
       </div>
+      <ChatBar selectedAsteroid={selectedAsteroid} />
     </main>
   );
 }
-
-

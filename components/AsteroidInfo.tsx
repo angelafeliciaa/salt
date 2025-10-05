@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import VideoModal from "./VideoModal";
 import { AsteroidData } from "./Asteroid";
 
 interface AsteroidInfoProps {
@@ -13,7 +14,12 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
       // Get the most recent close approach data
   const latestApproach = asteroid.closeApproachData && asteroid.closeApproachData.length > 0 
     ? asteroid.closeApproachData[0] 
-    : null;  return (
+    : null;
+  
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const videoSrc = "/videos/file.mp4";
+
+  return (
     <div className="asteroid-info-panel">
       <h2 className="asteroid-name">{asteroid.name}</h2>
       
@@ -27,6 +33,16 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
             <span className="safe-icon">✓</span> Non-Hazardous
           </span>
         )}
+      </div>
+
+      <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
+        <button
+          className="nav-button"
+          onClick={() => setIsVideoOpen(true)}
+          title="Play related video"
+        >
+          Watch video
+        </button>
       </div>
       
       <div className={`danger-stats ${asteroid.isPotentiallyHazardous ? 'hazardous' : 'safe'}`}>
@@ -66,6 +82,13 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
       </div>
 
       <p className="asteroid-id">NASA JPL ID: {asteroid.id}</p>
+
+      <VideoModal
+        isOpen={isVideoOpen}
+        onClose={() => setIsVideoOpen(false)}
+        src={videoSrc}
+        title={`About ${asteroid.name}`}
+      />
     </div>
   );
 }
