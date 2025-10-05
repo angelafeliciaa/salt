@@ -17,7 +17,17 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
     : null;
   
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const videoSrc = "/videos/file.mp4";
+
+  // Deterministic category from diameter (km)
+  // small < 0.05; medium 0.05–0.3; large 0.3–1.0; extra_large ≥ 1.0
+  const getVideoCategory = (d: number) => {
+    if (d < 0.05) return "small";
+    if (d < 0.50) return "medium";
+    if (d < 6.0) return "large";
+    return "extra_large";
+  };
+  const category = getVideoCategory(asteroid.diameter.avg);
+  const videoSrc = `/videos/${category}.mp4`;
 
   return (
     <div className="asteroid-info-panel">
