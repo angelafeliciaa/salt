@@ -47,6 +47,30 @@ export default function HomePage() {
             Preview is non-interactive. Click anywhere to open the live sandbox.
           </p>
         </div>
+        <div style={{ maxWidth: 1100, width: "100%", margin: "28px auto 0", padding: "0 0 28px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, textAlign: "left" }}>
+            <div style={{ background: "rgba(6,10,28,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}>
+              <h2 style={{ margin: 0, fontSize: 18, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 700, opacity: 0.95 }}>Why It Matters</h2>
+              <p style={{ marginTop: 10, opacity: 0.9, fontSize: 14, lineHeight: 1.6 }}>
+                A newly discovered asteroid, Impactor-2025, may one day intersect Earth’s path. Yet today, we lack intuitive and public tools to visualize what that could mean — the blast zone, the shock waves, the fallout, the decisions we’d face. This sandbox brings all that into view.
+              </p>
+            </div>
+            <div style={{ background: "rgba(6,10,28,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 16, boxShadow: "0 4px 20px rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}>
+              <h2 style={{ margin: 0, fontSize: 18, letterSpacing: 0.6, textTransform: "uppercase", fontWeight: 700, opacity: 0.95 }}>Explore & Simulate</h2>
+              <p style={{ marginTop: 10, opacity: 0.9, fontSize: 14, lineHeight: 1.6 }}>
+                Visualize real orbits. Test impact scenarios. Try mitigation strategies. Shift the timeline, tweak parameters, and see the consequences mapped in real time.
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>Visualize real orbits</span>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>Test impact scenarios</span>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>Try mitigation strategies</span>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>Shift the timeline</span>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>Tweak parameters</span>
+                <span style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: "6px 10px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: 0.2 }}>See consequences in real time</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );
