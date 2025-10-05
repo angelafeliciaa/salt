@@ -105,7 +105,6 @@ export function Solutions({ asteroid }: SolutionsProps) {
   return (
     <div className="asteroid-solutions-panel">
       <h1>Mitigation Strategies</h1>
-      <h2 className="asteroid-name">{asteroid.name}</h2>
       <ul className="solutions-list">
         <li>
           <div style={{ display: "flex", justifyContent: "space-between" }}>

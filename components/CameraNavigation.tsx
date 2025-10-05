@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useThree } from "@react-three/fiber";
 
 interface CameraNavigationProps {
   onNavigateToEarth: () => void;
@@ -21,7 +20,7 @@ export function CameraNavigation({
         onClick={onNavigateToAsteroid}
         disabled={!asteroidSelected}
       >
-        Asteroid
+        Find Asteroid
       </button>
     </div>
   );

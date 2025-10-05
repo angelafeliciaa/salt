@@ -79,7 +79,7 @@ export function CameraController({
       );
       
       // Significantly increase the view distance to zoom way out
-      const viewDistance = 8.0; // Extreme zoom out for a much wider perspective
+      const viewDistance = 32.0; // Extreme zoom out for a much wider perspective
       
       // Calculate distance from origin to asteroid
       const distanceFromOrigin = asteroidPosition.length();

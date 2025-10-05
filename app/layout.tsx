@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Asteroid Risk Lab — Impactor-2025',
-  description: 'Interactive asteroid impact visualization (mock data)',
+  title: 'Asteroid Risk — Impactor-2025',
+  description: 'Interactive asteroid model',
 };
 
 import './globals.css';
