@@ -2,7 +2,11 @@ import { AsteroidData } from "../components/Asteroid";
 import * as THREE from "three";
 
 // Function to calculate asteroid position in the 3D space
-export function calculateAsteroidPosition(asteroid: AsteroidData): [number, number, number] {
+// Added timeMode parameter to determine if this is for time-aware positioning
+export function calculateAsteroidPosition(
+  asteroid: AsteroidData, 
+  timeMode: boolean = false
+): [number, number, number] {
   // Get data from closest approach
   const approach = asteroid.closeApproachData[0];
   if (!approach) {
@@ -88,7 +92,7 @@ function calculatePositionAroundPlanet(planetDistance: number, asteroidDistance:
   // Scale the planet distance to our scene
   const scaledPlanetDistance = planetDistance * EARTH_DISTANCE;
   
-  // Use seed (asteroid ID) for deterministic angle - default to 0 if no seed
+  // Use seed (asteroid ID) for deterministic values - default to 0.5 if no seed
   // Convert the seed string to a consistent number between 0 and 1
   const hashCode = (str?: string): number => {
     if (!str) return 0.5;
@@ -101,21 +105,40 @@ function calculatePositionAroundPlanet(planetDistance: number, asteroidDistance:
     return Math.abs((hash % 1000) / 1000);
   };
   
-  // Generate deterministic values from seed
-  const seedValue = hashCode(seed);
-  const angle = seedValue * Math.PI * 2;
-  const elevation = (seedValue * 2 - 1) * 3; // Elevation range -3 to 3
+  // Generate deterministic values from seed for different aspects of position
+  const seedBase = hashCode(seed);
+  const seedAngle = hashCode(seed ? seed + "angle" : "angle");
+  const seedRadius = hashCode(seed ? seed + "radius" : "radius");
+  const seedElevation = hashCode(seed ? seed + "elevation" : "elevation");
   
-  // Calculate position using spherical coordinates
-  const x = Math.cos(angle) * scaledPlanetDistance * 1.2;
-  const z = Math.sin(angle) * scaledPlanetDistance * 1.2;
+  // Create a more varied distribution:
+  // 1. Variable angle around the orbital plane
+  const angle = seedAngle * Math.PI * 2;
   
-  // Use additional hash values for offsets to keep positions interesting but stable
-  const offsetSeedX = hashCode(seed ? seed + "x" : "x");
-  const offsetSeedZ = hashCode(seed ? seed + "z" : "z");
+  // 2. Variable distance from exact orbital distance (scattered cloud effect)
+  // Use a variable distance factor (0.7-1.7) times the base distance
+  const distanceFactor = 0.7 + seedRadius;
+  const baseDistance = scaledPlanetDistance * distanceFactor;
   
-  const offsetX = (offsetSeedX * 2 - 1) * 3; // Offset range -3 to 3
-  const offsetZ = (offsetSeedZ * 2 - 1) * 3;
+  // 3. More dramatic elevation variation
+  const elevation = (seedElevation * 2 - 1) * 6; // Elevation range -6 to 6
+  
+  // 4. Add perturbation to orbital path - no longer a perfect circle
+  const eccentricity = seedBase * 0.2; // 0-0.2 eccentricity
+  const semiMajorAxis = baseDistance;
+  const radius = semiMajorAxis * (1 - eccentricity * eccentricity) / (1 + eccentricity * Math.cos(angle));
+  
+  // Calculate position using modified spherical coordinates
+  const x = Math.cos(angle) * radius;
+  const z = Math.sin(angle) * radius;
+  
+  // Add additional randomized offsets for even more variation
+  const offsetSeedX = hashCode(seed ? seed + "offsetx" : "offsetx");
+  const offsetSeedZ = hashCode(seed ? seed + "offsetz" : "offsetz");
+  
+  // Larger offsets for more scattered appearance
+  const offsetX = (offsetSeedX * 2 - 1) * 8; // Offset range -8 to 8
+  const offsetZ = (offsetSeedZ * 2 - 1) * 8; // Offset range -8 to 8
   
   return [x + offsetX, elevation, z + offsetZ];
 }

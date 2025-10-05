@@ -115,9 +115,10 @@ def categorize_by_size(asteroids):
         'extra_large': extra_large
     }
 
-def select_samples(categorized_asteroids, samples_per_category=20):
+def select_samples(categorized_asteroids, samples_per_category=200):
     """
     Select a balanced sample of asteroids from each category
+    Default is now 200 per category for a total of 1000 asteroids
     """
     selected = []
     
@@ -151,6 +152,7 @@ def write_to_csv(asteroids, output_file):
 def main():
     input_file = "e:\\Github\\nasa\\utils\\sbdb_query_results.csv"
     output_file = "e:\\Github\\nasa\\utils\\selected_asteroids.csv"
+    api_output_file = "e:\\Github\\nasa\\app\\api\\neo\\selected_asteroids.csv"
     
     print("Reading asteroid data...")
     asteroids = read_asteroid_data(input_file)
@@ -167,12 +169,15 @@ def main():
             print(f"{category}: {len(category_asteroids)} asteroids, diameter range: {min_diameter:.2f} - {max_diameter:.2f} km")
     
     print("Selecting balanced sample...")
-    samples_per_category = 20  # To get 100 asteroids (20 from each of 5 categories)
+    samples_per_category = 100  # To get 1000 asteroids (100 from each of 10 categories)
     selected_asteroids = select_samples(categorized, samples_per_category)
     
     print("Writing selected asteroids to CSV...")
     write_to_csv(selected_asteroids, output_file)
+    # Also write to the API directory to ensure the web app uses the new data
+    write_to_csv(selected_asteroids, api_output_file)
     print(f"Successfully wrote {len(selected_asteroids)} asteroids to {output_file}")
+    print(f"Also wrote to {api_output_file} for API access")
 
 if __name__ == "__main__":
     main()
