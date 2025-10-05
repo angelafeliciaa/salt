@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useFrame, extend } from '@react-three/fiber'
 import { Billboard, shaderMaterial } from '@react-three/drei'
 import { Text } from '@react-three/drei'
+import * as THREE from 'three'
 
 // Inline GLSL noise to avoid requiring a loader
 const noiseShader = `
@@ -91,15 +92,17 @@ float noise(vec3 v) {
 const Sun = () => {
 
     const CustomShaderMaterial = shaderMaterial(
-        { emissiveIntensity: 1.0, time: 0 },
+        { emissiveIntensity: 5.0, time: 0 },
         // Vertex Shader
         `
         varying vec2 vUv;
         varying vec3 vPosition;
+        varying vec3 vNormal;
 
         void main() {
             vUv = uv;
             vPosition = position;
+            vNormal = normalize(normalMatrix * normal);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
         `,
@@ -109,16 +112,40 @@ const Sun = () => {
         uniform float emissiveIntensity;
         varying vec2 vUv;
         varying vec3 vPosition;
+        varying vec3 vNormal;
 
         ${noiseShader}
 
         void main() {
-            float noiseValue = noise(vPosition + time);
+            // Create multiple layers of noise at different scales
+            float noiseValue1 = noise(vPosition * 1.0 + time * 0.2);
+            float noiseValue2 = noise(vPosition * 1.5 + time * 0.3 + 10.0);
+            float noiseValue3 = noise(vPosition * 3.0 + time * 0.1 + 20.0) * 0.5;
+            
+            // Combine noise layers
+            float combinedNoise = noiseValue1 * 0.6 + noiseValue2 * 0.3 + noiseValue3 * 0.1;
+            
+            // Create edge highlighting based on the view angle
+            float edgeFactor = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 1.5);
+            
+            // Dynamic color based on noise
+            vec3 baseColor = mix(
+                vec3(1.0, 0.2, 0.0),  // Deep orange/red
+                vec3(1.0, 0.5, 0.0),  // Bright orange
+                combinedNoise
+            );
+            
+            // Add yellow to hot spots
+            baseColor = mix(baseColor, vec3(1.0, 0.9, 0.3), noiseValue3 * noiseValue3 * 0.6);
+            
+            // Enhance edges
+            baseColor = mix(baseColor, vec3(1.0, 0.9, 0.5), edgeFactor * 0.4);
+            
+            // Calculate final intensity with edge highlighting
+            float intensity = (combinedNoise * 0.5 + 0.5) * emissiveIntensity;
+            intensity = intensity * (1.0 + edgeFactor * 0.3);
 
-            vec3 color = mix(vec3(1.0, 0.1, 0.0), vec3(1.0, 0.2, 0.0), noiseValue);
-            float intensity = (noiseValue * 0.5 + 0.5) * emissiveIntensity;
-
-            gl_FragColor = vec4(color * intensity, 1.0);
+            gl_FragColor = vec4(baseColor * intensity, 1.0);
         }
         `
     )
@@ -127,33 +154,107 @@ const Sun = () => {
 
     const shaderRef = useRef<any>(null)
 
-    // Update the time uniform on each frame
+    // References for the glow layers
+    const glow1Ref = useRef<THREE.Mesh>(null)
+    const glow2Ref = useRef<THREE.Mesh>(null)
+    const glow3Ref = useRef<THREE.Mesh>(null)
+    
+    // Update the time uniform on each frame and animate the glow layers
     useFrame(({ clock }) => {
+        // Update shader time
         if (shaderRef.current) {
             shaderRef.current.uniforms.time.value = clock.elapsedTime
+        }
+        
+        // Subtle pulsating animation for glow layers
+        const t = clock.getElapsedTime()
+        
+        if (glow1Ref.current) {
+            glow1Ref.current.scale.set(
+                1.0 + Math.sin(t * 0.5) * 0.02,
+                1.0 + Math.sin(t * 0.5) * 0.02,
+                1.0 + Math.sin(t * 0.5) * 0.02
+            )
+        }
+        
+        if (glow2Ref.current) {
+            glow2Ref.current.scale.set(
+                1.0 + Math.sin(t * 0.3) * 0.03,
+                1.0 + Math.sin(t * 0.3) * 0.03,
+                1.0 + Math.sin(t * 0.3) * 0.03
+            )
+        }
+        
+        if (glow3Ref.current) {
+            glow3Ref.current.scale.set(
+                1.0 + Math.sin(t * 0.2) * 0.04,
+                1.0 + Math.sin(t * 0.2) * 0.04,
+                1.0 + Math.sin(t * 0.2) * 0.04
+            )
         }
     })
 
     return (
         <group userData={{ type: 'Sun' }}>
+            {/* Main sun sphere with custom shader for surface details */}
             <mesh>
                 <sphereGeometry args={[15, 32, 32]} />
-                <customShaderMaterial ref={shaderRef} emissiveIntensity={5} time={0} />
+                <customShaderMaterial ref={shaderRef} emissiveIntensity={8} time={0} />
             </mesh>
-            <Billboard position={[0, 15 * 1.3, 0]}>
-          <Text
-            fontSize={6 * 0.8}
-            color="#ffffff"
-            anchorX="center"
-            anchorY="bottom"
-            outlineWidth={3 * 0.05}
-            outlineColor="#00000077"
-          >
-            Sun
-          </Text>
-        </Billboard>
 
-            <pointLight position={[0, 0, 0]} intensity={50000} color={'rgb(255, 207, 55)'} />
+            {/* Multi-layered outer glow spheres */}
+            {/* First glow layer */}
+            <mesh ref={glow1Ref}>
+                <sphereGeometry args={[16.5, 32, 32]} />
+                <meshBasicMaterial 
+                  color="#ff7b00" 
+                  transparent={true} 
+                  opacity={0.15} 
+                  side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Second glow layer */}
+            <mesh ref={glow2Ref}>
+                <sphereGeometry args={[18, 32, 32]} />
+                <meshBasicMaterial 
+                  color="#ff9500" 
+                  transparent={true} 
+                  opacity={0.1} 
+                  side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Outermost glow layer */}
+            <mesh ref={glow3Ref}>
+                <sphereGeometry args={[22, 32, 32]} />
+                <meshBasicMaterial 
+                  color="#ffb700" 
+                  transparent={true} 
+                  opacity={0.05} 
+                  side={THREE.DoubleSide}
+                />
+            </mesh>
+            
+            {/* Name label */}
+            <Billboard position={[0, 15 * 1.3, 0]}>
+              <Text
+                fontSize={6 * 0.8}
+                color="#ffffff"
+                anchorX="center"
+                anchorY="bottom"
+                outlineWidth={3 * 0.05}
+                outlineColor="#00000077"
+              >
+                Sun
+              </Text>
+            </Billboard>
+
+            {/* Light sources */}
+            <pointLight position={[0, 0, 0]} intensity={80000} color={'rgb(255, 220, 100)'} />
+            
+            {/* Additional light to enhance the glow effect */}
+            <pointLight position={[0, 0, 0]} intensity={20000} color={'rgb(255, 150, 50)'} distance={100} />
         </group>
     )
 }
