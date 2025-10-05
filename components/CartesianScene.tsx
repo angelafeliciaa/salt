@@ -31,8 +31,8 @@ export type CartesianSceneProps = {
 export function CartesianScene({
   gridSize = 300,
   gridDivisions = 30,
-  showAxes = true,
-  showGrids = true,
+  showAxes = false,
+  showGrids = false,
   background = "#0a0a0a",
   cameraPosition = [200, 150, 200],
   originNode,

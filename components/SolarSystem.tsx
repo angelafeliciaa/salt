@@ -116,7 +116,7 @@ export const Planet = React.forwardRef(({
     <>
       {/* Orbit path visualization */}
       {(() => {
-        const thickness = orbitRadius * 0.005;
+        const thickness = orbitRadius * 0.0005;
         const inner = Math.max(0.001, orbitRadius - thickness / 2);
         const outer = orbitRadius + thickness / 2;
         return (

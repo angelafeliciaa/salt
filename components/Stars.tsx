@@ -17,7 +17,7 @@ export function Stars({
   radius = 1000, // Increased radius to be much farther away from the solar system
   starSize = 1.2, // Balanced star size for visibility while remaining realistic
   starColor = "#ffffff",
-  rotationSpeed = 0.00005 // Reduced rotation speed for stars at greater distance
+  rotationSpeed = 0.0 //0.00005 // Reduced rotation speed for stars at greater distance
 }: StarsProps) {
   const starsRef = useRef<THREE.InstancedMesh>(null);
   
