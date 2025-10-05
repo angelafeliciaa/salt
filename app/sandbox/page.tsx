@@ -112,7 +112,7 @@ export default function SandboxPage() {
       <div
         style={{
           position: "absolute",
-          top: "52%",
+          top: "65%",
           right: "0px",
           zIndex: 1000,
         }}
