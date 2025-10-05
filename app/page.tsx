@@ -122,7 +122,7 @@ export default function HomePage() {
           color: 'white',
           minWidth: '200px'
         }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
             <input
               type="checkbox"
               checked={useTimeAware}
@@ -131,13 +131,13 @@ export default function HomePage() {
             />
             <span style={{ fontWeight: '600' }}>Time-Aware Mode</span>
           </label>
-          {useTimeAware && (
+          {/* {useTimeAware && (
             <div style={{ fontSize: '12px', color: '#ccc', lineHeight: '1.4' }}>
               <div>• Drag the time slider to see planets at different times</div>
               <div>• Use play/pause to control time flow</div>
               <div>• Click "Now" to return to current time</div>
             </div>
-          )}
+          )} */}
         </div>
       </div>
       

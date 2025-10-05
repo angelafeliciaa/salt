@@ -20,13 +20,11 @@ export function AsteroidInfo({ asteroid }: AsteroidInfoProps) {
       <div className="hazard-indicator">
         {asteroid.isPotentiallyHazardous ? (
           <span className="hazard-badge hazardous">
-            <span className="warning-icon">⚠️</span> 
-            Potentially Hazardous
+            <span className="warning-icon">⚠️</span> Potentially Hazardous
           </span>
         ) : (
           <span className="hazard-badge safe">
-            <span className="safe-icon">✓</span> 
-            Non-Hazardous
+            <span className="safe-icon">✓</span> Non-Hazardous
           </span>
         )}
       </div>

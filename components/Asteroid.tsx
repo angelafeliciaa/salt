@@ -110,6 +110,7 @@ export const Asteroid = forwardRef(({
       onClick={onClick}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
+      style={{ cursor: 'pointer' }}
     >
       {/* Hazardous glow effect */}
       <mesh ref={glowRef}>
