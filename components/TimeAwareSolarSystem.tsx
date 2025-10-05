@@ -8,7 +8,8 @@ import Sun from "./Sun";
 import EnhancedPlanet from "./EnhancedPlanet";
 import Stars from "./Stars";
 import Explosion from "./Explosion";
-import Asteroid, { AsteroidData } from "./Asteroid";
+import { AsteroidData } from "./Asteroid";
+import AsteroidModel from "./AsteroidModel";
 import { BODIES, helioXYZAt } from '../utils/ephemeris';
 import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
 
@@ -235,12 +236,13 @@ export function TimeAwareSolarSystem({
         if (selectedIndex >= 0) {
           const selectedAsteroid = asteroids[selectedIndex];
           return (
-            <Asteroid
+            <AsteroidModel
               key={selectedAsteroid.id}
               asteroid={selectedAsteroid}
               position={asteroidPositions[selectedIndex] || [0, 0, 0]}
               selected={true}
               onClick={() => onAsteroidClick(selectedAsteroid)}
+              modelPath="/shaders/asteroidPack.glb"
             />
           );
         }
