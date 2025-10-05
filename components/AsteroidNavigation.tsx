@@ -22,6 +22,7 @@ export function AsteroidNavigation({
       <div className="navigation-controls">
         <button 
           className="nav-button prev-button"
+          style={{ marginRight: '10px' }}
           onClick={onPrevious}
           disabled={currentIndex <= 0}
         >

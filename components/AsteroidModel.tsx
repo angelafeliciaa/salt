@@ -223,7 +223,7 @@ export const AsteroidModel = forwardRef(({
       {(hovered || selected) && (
         <Billboard position={[0, size * 1.2, 0]}>
           <Text
-            fontSize={0.1}
+            fontSize={0.8}
             color="#ffffff"
             anchorX="center"
             anchorY="bottom"
