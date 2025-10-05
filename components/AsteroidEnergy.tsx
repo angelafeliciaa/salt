@@ -52,13 +52,11 @@ export function AsteroidEnergy({ asteroid }: AsteroidEnergyProps) {
   const isHazardous = asteroid.isPotentiallyHazardous;
 
   return (
-    <div className={`asteroid-energy-panel hazard-${hazardLevel} ${isHazardous ? 'hazardous' : 'non-hazardous'}`}>
-      <h3 className="energy-title">Impact Energy</h3>
-      
-      <div className="hazard-level-indicator">
-        <div className={`hazard-indicator-bar hazard-${hazardLevel}`}></div>
-        <span className="hazard-level-label">{hazardLevel.charAt(0).toUpperCase() + hazardLevel.slice(1)} Impact</span>
+    <div className={`asteroid-energy-panel hazard-${hazardLevel} hazardous`}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+      <h3 className="energy-title">Impact Energy - {hazardLevel.charAt(0).toUpperCase() + hazardLevel.slice(1)} Impact</h3>
       </div>
+      
       
       <div className="energy-stats">
         <div className="energy-stat">

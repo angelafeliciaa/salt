@@ -108,38 +108,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Mode Toggle */}
-      <div style={{
-        position: 'absolute',
-        top: '20px',
-        left: '20px',
-        zIndex: 1000
-      }}>
-        <div style={{
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          padding: '12px',
-          borderRadius: '8px',
-          color: 'white',
-          minWidth: '200px'
-        }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-            <input
-              type="checkbox"
-              checked={useTimeAware}
-              onChange={(e) => setUseTimeAware(e.target.checked)}
-              style={{ margin: 0, transform: 'scale(1.2)' }}
-            />
-            <span style={{ fontWeight: '600' }}>Time-Aware Mode</span>
-          </label>
-          {/* {useTimeAware && (
-            <div style={{ fontSize: '12px', color: '#ccc', lineHeight: '1.4' }}>
-              <div>• Drag the time slider to see planets at different times</div>
-              <div>• Use play/pause to control time flow</div>
-              <div>• Click "Now" to return to current time</div>
-            </div>
-          )} */}
-        </div>
-      </div>
+      
       
       {/* Asteroid Energy Panel (visible when asteroid is selected) */}
       {selectedAsteroid && !loading && (
@@ -166,13 +135,42 @@ export default function HomePage() {
           onNext={nextAsteroid}
         />
       )}
+
+      {/* Mode Toggle */}
+      <div style={{
+        position: 'absolute',
+        top: '52%',
+        right: '0px',
+        zIndex: 1000
+      }}>
+        <div style={{
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          padding: '12px',
+          borderRadius: '8px',
+          color: 'white',
+          minWidth: '200px'
+        }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+            <input
+              type="checkbox"
+              checked={useTimeAware}
+              onChange={(e) => setUseTimeAware(e.target.checked)}
+              style={{ margin: 0, transform: 'scale(1.2)' }}
+            />
+            <span style={{ fontWeight: '600' }}>Time-Aware Mode</span>
+          </label>
+        </div>
+      </div>
       
       {/* Camera Navigation buttons */}
+      <div>
       <CameraNavigation
         onNavigateToEarth={() => setNavigationTarget("earth")}
         onNavigateToAsteroid={() => setNavigationTarget("asteroid")}
         asteroidSelected={!!selectedAsteroid}
       />
+      </div>
+      
     </main>
   );
 }
