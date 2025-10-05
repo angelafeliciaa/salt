@@ -66,6 +66,7 @@ export function TimeScrubber({
         padding: 16,
         color: '#ffffff',
         backdropFilter: 'blur(8px)',
+        marginBottom: 40,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
       }}
     >
