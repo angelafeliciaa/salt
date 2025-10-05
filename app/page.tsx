@@ -16,9 +16,9 @@ export default function HomePage() {
   const [animationSpeed, setAnimationSpeed] = useState(0.5);
   const [showLabels, setShowLabels] = useState(true);
   const [navigationTarget, setNavigationTarget] = useState<"none" | "earth" | "asteroid">("none");
-  const [useTimeAware, setUseTimeAware] = useState(false);
+  const [useTimeAware, setUseTimeAware] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   
   // Use the asteroid manager hook to handle asteroid data and logic
   const {
@@ -86,15 +86,7 @@ export default function HomePage() {
           />
         )}
       </CartesianScene>
-      
-      {/* Controls overlay */}
-      <SolarSystemControls
-        animationSpeed={animationSpeed}
-        setAnimationSpeed={setAnimationSpeed}
-        showLabels={showLabels}
-        setShowLabels={setShowLabels}
-      />
-
+    
       {/* Time Scrubber - only show when time-aware mode is enabled */}
       {useTimeAware && (
         <div style={{

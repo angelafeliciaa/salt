@@ -61,7 +61,8 @@ export function TimeScrubber({
       {/* Header with Play/Pause */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-3">
-          <button
+          
+          { /*<button
             onClick={onPauseToggle}
             className="flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 rounded-full transition-colors"
             title={isPaused ? 'Play' : 'Pause'}
@@ -75,7 +76,7 @@ export function TimeScrubber({
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
             )}
-          </button>
+          </button> */ }
           <div className="text-sm">
             <span className="text-gray-300">Time: </span>
             <span className="font-mono">{formatTime(localTime)}</span>
