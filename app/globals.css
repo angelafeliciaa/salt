@@ -219,14 +219,33 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   position: absolute;
   bottom: 20px;
   left: 20px;
-  width: 300px;
-  background-color: rgba(6, 10, 28, 0.8);
+  width: 380px;
+  background-color: rgba(6, 10, 28, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.asteroid-solutions-panel h1 {
+  font-size: 20px;
+  margin: 0 0 10px 0;
+  color: #fff;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ffffff, #64b5f6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .asteroid-name {
-  font-size: 18px;
+  font-size: 16px;
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   color: #fff;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 8px;
@@ -313,15 +332,37 @@ html, body { margin: 0; background: radial-gradient(1200px 800px at 70% 20%, #0b
   list-style-type: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  grid-gap: 8px;
+}
+
+.solutions-list li {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px;
+  transition: all 0.2s ease;
+}
+
+.solutions-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .solutions-list a {
-  color: #fff;
+  color: #64b5f6;
   text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.solutions-list a:hover {
+  color: #90caf9;
 }
 
 .solutions-list p {
-  font-size: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 3px 0 0 0;
 }
 
 .asteroid-counter {
