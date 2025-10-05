@@ -1,6 +1,6 @@
 "use client";
 
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
@@ -19,6 +19,12 @@ export function CameraController({
 }: CameraControllerProps) {
   const { camera, controls } = useThree();
   const isAnimatingRef = useRef(false);
+  const currentNavigationTargetRef = useRef<string>("none");
+  
+  // Store the current navigation target for use in the tracking effect
+  useEffect(() => {
+    currentNavigationTargetRef.current = navigationTarget;
+  }, [navigationTarget]);
 
   // Handle navigation requests
   useEffect(() => {
@@ -154,6 +160,32 @@ export function CameraController({
       animateCamera();
     }
   }, [navigationTarget, earthRef, asteroidRef, camera, controls, onNavigationComplete]);
+  
+  // Use frame hook for continuous tracking of animated objects
+  useFrame(() => {
+    // Only continuously track if we're currently tracking an asteroid
+    if (currentNavigationTargetRef.current === "asteroid" && asteroidRef.current && !isAnimatingRef.current) {
+      // Get the current asteroid position
+      const asteroidPosition = new THREE.Vector3();
+      asteroidRef.current.getWorldPosition(asteroidPosition);
+      
+      // Set target to a point between the asteroid and the center of the scene
+      // This provides more solar system context in the view
+      const centerOffset = 0.3; // How much to bias toward the center
+      const targetPosition = new THREE.Vector3(
+        asteroidPosition.x * (1 - centerOffset),
+        asteroidPosition.y * (1 - centerOffset),
+        asteroidPosition.z * (1 - centerOffset)
+      );
+      
+      // Smoothly update the camera target
+      const smoothness = 0.1; // Lower = smoother transitions
+      if (controls) {
+        (controls as any).target.lerp(targetPosition, smoothness);
+        (controls as any).update();
+      }
+    }
+  });
   
   return null;
 }

@@ -10,6 +10,7 @@ import Stars from "./Stars";
 import Explosion from "./Explosion";
 import { AsteroidData } from "./Asteroid";
 import AsteroidModel from "./AsteroidModel";
+import AnimatedAsteroid from "./AnimatedAsteroid";
 import CameraController from "./CameraController";
 import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
 // Planet texture maps (diffuse/color)
@@ -74,7 +75,7 @@ const innerPlanets: PlanetData[] = [
 
 // For the solar system, we scale Earth to be a certain size and distance,
 // then use those as a reference for other planets
-const EARTH_SIZE = 0.15; // Visual size in the scene
+const EARTH_SIZE = 0.2; // Visual size in the scene (increased from 0.15)
 const EARTH_DISTANCE = 2.5; // Distance from Sun in scene units
 const ANIMATION_SPEED = 0.5; // Higher values = faster orbits
 
@@ -313,20 +314,20 @@ export default function SolarSystem({
         );
       })}
       
-      {/* Render all asteroids */}
+      {/* Render all asteroids with orbital animation */}
       {asteroids.map((asteroid, index) => {
         const isSelected = asteroid.id === selectedAsteroidId;
         const ref = isSelected ? asteroidRef : null;
         
         return (
-          <AsteroidModel
+          <AnimatedAsteroid
             key={asteroid.id}
             asteroid={asteroid}
-            position={asteroidPositions[index] || [0, 0, 0]}
+            basePosition={asteroidPositions[index] || [0, 0, 0]}
             selected={isSelected}
             onClick={() => onAsteroidClick(asteroid)}
             ref={isSelected ? ref : undefined}
-            modelPath="/shaders/asteroidPack.glb"
+            animationSpeed={animationSpeed}
           />
         );
       })}

@@ -35,8 +35,8 @@ export const AsteroidModel = forwardRef(({
   const modelRef = useRef<THREE.Group | null>(null);
   
   // Calculate size based on asteroid diameter, but keep it visible
-  // Increased scaling factor from 0.1 to 0.25 to match Asteroid.tsx
-  const size = Math.max(0.15, asteroid.diameter.avg * 0.25);
+  // Increased scaling factor from 0.1 to 0.5 to match Asteroid.tsx
+  const size = Math.max(0.15, asteroid.diameter.avg * 0.5);
   
   // Handle model setup after loading
   useEffect(() => {
@@ -166,6 +166,26 @@ export const AsteroidModel = forwardRef(({
 
   // No rotation animation - asteroid stays still
   // Comment out rotation animation to keep asteroid orientation fixed
+
+  // Track the current target position for smooth transitions
+  const targetPos = useRef<THREE.Vector3>(new THREE.Vector3(...position));
+
+  // Handle smooth position transitions when position changes (for time-aware mode)
+  useFrame(() => {
+    if (groupRef.current) {
+      // Update target position when actual position changes
+      if (
+        targetPos.current.x !== position[0] ||
+        targetPos.current.y !== position[1] ||
+        targetPos.current.z !== position[2]
+      ) {
+        targetPos.current.set(position[0], position[1], position[2]);
+      }
+
+      // Smoothly interpolate current position towards target position
+      groupRef.current.position.lerp(targetPos.current, 0.05);
+    }
+  });
 
   // Simple ref for hazard indicator without animation
   const glowRef = useRef<THREE.Group>(null);

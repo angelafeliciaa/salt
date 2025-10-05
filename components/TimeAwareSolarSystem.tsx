@@ -10,6 +10,7 @@ import Stars from "./Stars";
 import Explosion from "./Explosion";
 import { AsteroidData } from "./Asteroid";
 import AsteroidModel from "./AsteroidModel";
+import CameraController from "./CameraController";
 import { BODIES, helioXYZAt } from '../utils/ephemeris';
 import { OrbitTrailsProvider, useOrbitTrails } from "./OrbitTrailsContext";
 // Planet texture maps (diffuse/color)
@@ -73,7 +74,7 @@ const planets: PlanetData[] = [
 ];
 
 // Scaling constants - matching SolarSystem.tsx
-const EARTH_SIZE = 0.15; // Visual size in the scene
+const EARTH_SIZE = 0.2; // Visual size in the scene (increased from 0.15)
 const EARTH_DISTANCE = 2.5; // Distance from Sun in scene units
 const SCALE_FACTOR = 1 / 50_000_000; // 1 unit = 50 million km (for real positions)
 
@@ -87,6 +88,8 @@ interface TimeAwareSolarSystemProps {
   currentTime?: Date;
   isPaused?: boolean;
   onTimeChange?: (time: Date) => void;
+  navigationTarget?: "none" | "earth" | "asteroid";
+  onNavigationComplete?: () => void;
 }
 
 export function TimeAwareSolarSystem({
@@ -98,8 +101,13 @@ export function TimeAwareSolarSystem({
   onAsteroidClick = () => {},
   currentTime = new Date(),
   isPaused = false,
-  onTimeChange
+  onTimeChange,
+  navigationTarget = "none",
+  onNavigationComplete = () => {}
 }: TimeAwareSolarSystemProps) {
+  // Refs for planets and asteroids
+  const earthRef = useRef<THREE.Group>(null);
+  const asteroidRef = useRef<THREE.Group>(null);
   const [showExplosion, setShowExplosion] = useState(false);
   const [explosionPosition, setExplosionPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [useRealPositions, setUseRealPositions] = useState(false);
@@ -162,11 +170,30 @@ export function TimeAwareSolarSystem({
     return [x, y, z];
   };
 
-  // Planet component
-  const Planet = ({ planet, position }: { planet: PlanetData; position: [number, number, number] }) => {
+  // Planet component with ref forwarding
+  const Planet = React.forwardRef(({ 
+    planet, 
+    position 
+  }: { 
+    planet: PlanetData; 
+    position: [number, number, number] 
+  }, ref: React.ForwardedRef<THREE.Group>) => {
     const planetRef = useRef<THREE.Group>(null);
     const [hovered, setHovered] = useState(false);
     const { addTrailPoint } = useOrbitTrails();
+    
+    // Handle both refs - internal ref and forwarded ref
+    const handleRef = (node: THREE.Group | null) => {
+      // Set internal ref
+      planetRef.current = node;
+      
+      // Handle the forwarded ref
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    };
     
     // Generate a unique ID for this planet
     const planetId = useRef(`planet-${planet.name}-${Math.random().toString(36).substr(2, 9)}`);
@@ -198,7 +225,7 @@ export function TimeAwareSolarSystem({
                            
     return (
       <group
-        ref={planetRef}
+        ref={handleRef}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
@@ -231,7 +258,10 @@ export function TimeAwareSolarSystem({
         </group>
       </group>
     );
-  };
+  });
+  
+  // Add display name for better debugging
+  Planet.displayName = "Planet";
 
   return (
     <OrbitTrailsProvider maxPoints={300} trailColor="#ffffff" trailOpacity={0.15}>
@@ -244,29 +274,117 @@ export function TimeAwareSolarSystem({
       {/* Planets */}
       {planets.map((planet) => {
         const position = calculatePlanetPosition(planet, currentTime);
+        // Assign earthRef to Earth planet
+        const ref = planet.name === "Earth" ? earthRef : undefined;
+        
         return (
           <Planet 
             key={planet.name} 
             planet={planet} 
-            position={position} 
+            position={position}
+            ref={ref}
           />
         );
       })}
       
-      {/* Render all asteroids */}
+      {/* Render all asteroids - with time-based positions */}
       {asteroids.map((asteroid, index) => {
         const isSelected = asteroid.id === selectedAsteroidId;
         
         // Only render if we have position data
         if (asteroidPositions[index]) {
+          // Get the base position first
+          const basePosition = asteroidPositions[index];
+          const orbitingBody = asteroid.closeApproachData[0]?.orbitingBody || 'Earth';
+          
+          // Calculate time-aware position for the asteroid based on time
+          let timeBasedPosition: [number, number, number] = [...basePosition];
+          
+          // Get asteroid orbit parameters from base position
+          const distanceFromSun = Math.sqrt(
+            basePosition[0] * basePosition[0] + 
+            basePosition[2] * basePosition[2]
+          );
+          
+          // Calculate the original angle from the base position
+          const originalAngle = Math.atan2(basePosition[2], basePosition[0]);
+          
+          // Use asteroid ID to generate consistent orbital parameters
+          const generateParameter = (seed: string, min: number, max: number) => {
+            // Simple hash function for the seed string
+            let hash = 0;
+            for (let i = 0; i < seed.length; i++) {
+              hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+              hash = hash & hash; // Convert to 32bit integer
+            }
+            // Normalize to 0-1 range then scale to desired range
+            const value = Math.abs((hash % 1000) / 1000);
+            return min + value * (max - min);
+          };
+          
+          // Get orbital parameters based on asteroid ID
+          const eccentricity = generateParameter(asteroid.id + "-ecc", 0.02, 0.2);
+          const inclination = generateParameter(asteroid.id + "-inc", -0.15, 0.15);
+          
+          // Calculate orbit period based on orbiting body and distance
+          let orbitalPeriod: number;
+          
+          if (orbitingBody === 'Mercury') {
+            orbitalPeriod = 88 * Math.pow(distanceFromSun / 40, 1.5);
+          } else if (orbitingBody === 'Venus') {
+            orbitalPeriod = 225 * Math.pow(distanceFromSun / 70, 1.5);
+          } else if (orbitingBody === 'Earth') {
+            orbitalPeriod = 365.25 * Math.pow(distanceFromSun / 100, 1.5);
+          } else if (orbitingBody === 'Mars') {
+            orbitalPeriod = 687 * Math.pow(distanceFromSun / 150, 1.5);
+          } else {
+            orbitalPeriod = 1000 * Math.pow(distanceFromSun / 100, 1.5);
+          }
+          
+          // Add variation based on asteroid ID
+          const periodVariation = generateParameter(asteroid.id + "-period", 0.9, 1.1);
+          orbitalPeriod *= periodVariation;
+          
+          // Get the j2000 date for reference - same as for planets
+          const j2000 = new Date('2000-01-01T12:00:00Z');
+          const daysSinceJ2000 = (currentTime.getTime() - j2000.getTime()) / (1000 * 60 * 60 * 24);
+          
+          // Calculate mean anomaly based on time - static for the current time
+          const meanAnomaly = (360 * daysSinceJ2000 / orbitalPeriod) % 360;
+          const meanAnomalyRad = (meanAnomaly * Math.PI) / 180;
+          
+          // Calculate position based on orbital parameters and time
+          const newAngle = originalAngle + meanAnomalyRad;
+          
+          // Calculate radius with eccentricity (Kepler's first law)
+          const semiMajorAxis = distanceFromSun; 
+          const radius = semiMajorAxis * (1 - eccentricity * eccentricity) / 
+                        (1 + eccentricity * Math.cos(newAngle));
+          
+          // Calculate the new position based on the angle and distance
+          timeBasedPosition = [
+            Math.cos(newAngle) * radius,
+            basePosition[1] + Math.sin(newAngle) * inclination * radius,
+            Math.sin(newAngle) * radius
+          ];
+          
+          // Special behavior for hazardous asteroids
+          if (asteroid.isPotentiallyHazardous) {
+            // Add slight position variation for hazardous asteroids
+            const variation = Math.sin(parseFloat(asteroid.id) + daysSinceJ2000 / 100) * radius * 0.05;
+            timeBasedPosition[0] += variation;
+            timeBasedPosition[2] += variation;
+          }
+          
+          // Use the AsteroidModel with time-based position (but no animation)
           return (
             <AsteroidModel
               key={asteroid.id}
               asteroid={asteroid}
-              position={asteroidPositions[index] || [0, 0, 0]}
+              position={timeBasedPosition}  // Use time-based position that updates with currentTime
               selected={isSelected}
               onClick={() => onAsteroidClick(asteroid)}
-              modelPath="/shaders/asteroidPack.glb"
+              ref={isSelected ? asteroidRef : undefined}
             />
           );
         }
@@ -293,6 +411,14 @@ export function TimeAwareSolarSystem({
         <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
+      
+      {/* Camera controller for Earth and Asteroid navigation */}
+      <CameraController 
+        earthRef={earthRef}
+        asteroidRef={asteroidRef}
+        navigationTarget={navigationTarget}
+        onNavigationComplete={onNavigationComplete}
+      />
     </OrbitTrailsProvider>
   );
 }

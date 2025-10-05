@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
       relax_column_count: true
     });
     
-    // Take only the first 100 records
-    const limitedRecords = records.slice(0, 100);
+    // Take all records (up to 1000)
+    const limitedRecords = records.slice(0, 1000);
     
     console.log(`Read ${limitedRecords.length} asteroid records from CSV file`);
     
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
       metadata: {
         totalCount: allNeos.length,
         hazardousCount: filteredNeos.length,
-        source: 'CSV file (first 100 records)'
+        source: 'CSV file (up to 1000 records)'
       }
     });
     

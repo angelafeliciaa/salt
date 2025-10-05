@@ -59,8 +59,8 @@ export const Asteroid = forwardRef(({
   const [hovered, setHovered] = useState(false);
 
   // Calculate size based on asteroid diameter, but keep it visible
-  // Increased scaling factor from 0.1 to 0.25 to make asteroids larger
-  const size = Math.max(0.15, asteroid.diameter.avg * 0.25);
+  // Increased scaling factor from 0.1 to 0.5 to match AsteroidModel.tsx
+  const size = Math.max(0.005, asteroid.diameter.avg * 0.005);
   
   // All asteroids are hazardous now, use a more threatening color
   const color = "#ff2200"; // Bright red for hazardous asteroids

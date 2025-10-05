@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -43,6 +43,11 @@ export function OrbitTrailsProvider({
 
   // Add a point to a trail
   const addTrailPoint = useCallback((key: string, position: THREE.Vector3) => {
+    // Skip trail points for asteroid objects
+    if (key.startsWith('asteroid-')) {
+      return; // Don't create trails for asteroids
+    }
+    
     setTrails((prevTrails) => {
       const trail = prevTrails[key] || [];
       // Remove oldest point if trail is at max length
@@ -66,6 +71,20 @@ export function OrbitTrailsProvider({
     setTrails((prevTrails) => {
       const { [key]: _, ...rest } = prevTrails;
       return rest;
+    });
+  }, []);
+  
+  // Clear any existing asteroid trails when component mounts
+  useEffect(() => {
+    setTrails((prevTrails) => {
+      // Filter out any keys that start with "asteroid-"
+      const filteredTrails: TrailsMap = {};
+      Object.entries(prevTrails).forEach(([key, value]) => {
+        if (!key.startsWith('asteroid-')) {
+          filteredTrails[key] = value;
+        }
+      });
+      return filteredTrails;
     });
   }, []);
 
