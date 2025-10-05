@@ -166,16 +166,47 @@ def main():
         if category_asteroids:
             min_diameter = min(a['diameter'] for a in category_asteroids)
             max_diameter = max(a['diameter'] for a in category_asteroids)
+            # Calculate average kinetic energy for this category
+            total_energy = sum(a['energy'] for a in category_asteroids)
+            avg_energy = total_energy / len(category_asteroids)
+            # Format energy in scientific notation for readability
+            avg_energy_sci = f"{avg_energy:.2e}"
             print(f"{category}: {len(category_asteroids)} asteroids, diameter range: {min_diameter:.2f} - {max_diameter:.2f} km")
+            print(f"   Average kinetic energy: {avg_energy_sci} joules")
     
     print("Selecting balanced sample...")
-    samples_per_category = 100  # To get 1000 asteroids (100 from each of 10 categories)
+    samples_per_category = 200  # To get approximately 1000 asteroids (200 from each of 5 categories)
     selected_asteroids = select_samples(categorized, samples_per_category)
+    
+    print("Statistics for selected sample:")
+    # Group selected asteroids by category for energy analysis
+    selected_by_category = defaultdict(list)
+    for asteroid in selected_asteroids:
+        # Determine which category this asteroid belongs to
+        for category, category_asteroids in categorized.items():
+            if asteroid in category_asteroids:
+                selected_by_category[category].append(asteroid)
+                break
+    
+    # Print energy statistics for selected asteroids by category
+    for category, asteroids in selected_by_category.items():
+        if asteroids:
+            total_energy = sum(a['energy'] for a in asteroids)
+            avg_energy = total_energy / len(asteroids)
+            avg_energy_sci = f"{avg_energy:.2e}"
+            print(f"Selected {category}: {len(asteroids)} asteroids, avg energy: {avg_energy_sci} joules")
     
     print("Writing selected asteroids to CSV...")
     write_to_csv(selected_asteroids, output_file)
     # Also write to the API directory to ensure the web app uses the new data
     write_to_csv(selected_asteroids, api_output_file)
+    # Calculate overall average energy of selected asteroids
+    if selected_asteroids:
+        total_energy = sum(a['energy'] for a in selected_asteroids)
+        overall_avg_energy = total_energy / len(selected_asteroids)
+        overall_avg_energy_sci = f"{overall_avg_energy:.2e}"
+        print(f"Overall average kinetic energy for all selected asteroids: {overall_avg_energy_sci} joules")
+    
     print(f"Successfully wrote {len(selected_asteroids)} asteroids to {output_file}")
     print(f"Also wrote to {api_output_file} for API access")
 
