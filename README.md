@@ -50,6 +50,4 @@ A 3D interactive visualization of the solar system built with Next.js, React Thr
 - Toggle labels on/off
 - Double-click anywhere to trigger explosion effects (Easter egg)
 
-## License
-
-MIT License
+we won nasa space apps btw
